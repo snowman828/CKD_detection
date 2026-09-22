@@ -1,0 +1,26 @@
+{
+  "n_total": 17530,
+  "ckd_prevalence_weighted_pct": 13.45,
+  "ckd_g3plus_weighted_pct": 5.36,
+  "albuminuria_weighted_pct": 9.8,
+  "nadkd_candidate_weighted_pct": 0.82,
+  "diabetes_weighted_pct": 10.44,
+  "by_cycle": {
+    "G": {
+      "n": 5807,
+      "ckd_pct": 4.23
+    },
+    "I": {
+      "n": 5922,
+      "ckd_pct": 4.5
+    },
+    "J": {
+      "n": 5801,
+      "ckd_pct": 4.72
+    }
+  },
+  "egfr_median": 98.44827553648804,
+  "uacr_median": 7.349397590361446,
+  "age_mean": 48.65025670279521,
+  "female_pct": 50.8
+}

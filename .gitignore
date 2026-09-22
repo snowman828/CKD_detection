@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+venv/
+# data are fetched, not committed (public NHANES)
+*.parquet
+*.sas7bdat
+*.xpt
+data/
+# build artifacts
+*.zip
+*.tar.gz
+results/_prev_*/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the accompanying article (citation to be completed on publication)."
+title: "MACKI-Dry: detection of chronic kidney disease from routine non-kidney-specific clinical data (NHANES 2011-2018)"
+authors:
+  - family-names: Zhao
+    given-names: Yixin
+    # ORCID: <to be added by the author>
+  - family-names: Zhang
+    given-names: Zhiyong
+  - family-names: Wang
+    given-names: Dawei
+    email: nit05wangdawei@163.com
+license: MIT
+type: software
+# doi: <to be added on publication>
+# repository-code: <YOUR_REPO_URL, to be added by the author>

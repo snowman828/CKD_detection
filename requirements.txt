@@ -1,0 +1,12 @@
+# 由 scripts/*.py 的实际 import 反推；版本取自本机科学环境（uv pip list）。
+# Rerun: python -m pip install -r requirements.txt
+Pillow==12.3.0
+PySocks  # version not pinned in source env
+PyYAML==6.0.3
+lifelines==0.30.3
+matplotlib==3.11.1
+pandas==2.3.3
+scikit-learn==1.9.0
+scipy==1.17.1
+seaborn  # version not pinned in source env
+xgboost==3.2.0
