@@ -5,6 +5,8 @@ development and external temporal validation of machine-learning models.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+**Public repository**: https://github.com/snowman828/CKD_detection
+
 This repository contains the complete, reproducible analysis pipeline for the study. The corresponding manuscript is
 in submission; the citation will be completed on publication (see `CITATION.cff`).
 
@@ -18,7 +20,7 @@ in submission; the citation will be completed on publication (see `CITATION.cff`
    `scripts/modeling.py` (fixed seeds are set in the scripts). The repository therefore provides the exact code path
    that produces the model, not a pre-trained binary.
 3. **Source data used for performance evaluation** — public-use NHANES files; see `DATA_AVAILABILITY.md` for the
-   official download locations and for the scripts that rebuild the analysis cohort.
+   official download locations (this repository: https://github.com/snowman828/CKD_detection) and for the scripts that rebuild the analysis cohort.
 
 ## Pipeline
 ```bash

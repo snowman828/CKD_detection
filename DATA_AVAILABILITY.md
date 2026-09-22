@@ -1,5 +1,7 @@
 # Data availability
 
+Analysis code and the pre-specified analysis plan: **https://github.com/snowman828/CKD_detection** (MIT).
+
 ## Source data (public, no restrictions)
 All input data are public-use files from the **National Health and Nutrition Examination Survey (NHANES)**,
 US Centers for Disease Control and Prevention (CDC) / National Center for Health Statistics (NCHS):
