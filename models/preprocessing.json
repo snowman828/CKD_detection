@@ -1,0 +1,77 @@
+{
+  "features_raw": [
+    "age",
+    "sex",
+    "race",
+    "poverty_ratio",
+    "education",
+    "bmi",
+    "sbp",
+    "dbp",
+    "hba1c",
+    "diabetes",
+    "total_cholesterol",
+    "hdl"
+  ],
+  "encoding": {
+    "race_black": "race == 4",
+    "race_hisp": "race in (1, 2)",
+    "race_other": "race not in (3, 4, 1, 2)",
+    "female": "sex == 2",
+    "dropped": [
+      "race",
+      "sex"
+    ]
+  },
+  "imputation": {
+    "strategy": "median (fit on development set only)",
+    "median_values": {
+      "age": 47.0,
+      "poverty_ratio": 1.94,
+      "education": 4.0,
+      "bmi": 27.8,
+      "sbp": 122.0,
+      "dbp": 70.0,
+      "hba1c": 5.5,
+      "diabetes": 0.0,
+      "total_cholesterol": 186.0,
+      "hdl": 50.0,
+      "race_black": 0.0,
+      "race_hisp": 0.0,
+      "race_other": 0.0,
+      "female": 1.0
+    }
+  },
+  "final_columns": [
+    "age",
+    "poverty_ratio",
+    "education",
+    "bmi",
+    "sbp",
+    "dbp",
+    "hba1c",
+    "diabetes",
+    "total_cholesterol",
+    "hdl",
+    "race_black",
+    "race_hisp",
+    "race_other",
+    "female",
+    "miss_age",
+    "miss_poverty_ratio",
+    "miss_education",
+    "miss_bmi",
+    "miss_sbp",
+    "miss_dbp",
+    "miss_hba1c",
+    "miss_diabetes",
+    "miss_total_cholesterol",
+    "miss_hdl",
+    "miss_race_black",
+    "miss_race_hisp",
+    "miss_race_other",
+    "miss_female"
+  ],
+  "final_n_features": 28,
+  "note": "Apply: select features_raw → one-hot as above → fill NaN with median_values → append miss_<column> indicators in final_columns order → predict_proba."
+}

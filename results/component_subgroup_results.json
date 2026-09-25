@@ -1,0 +1,91 @@
+{
+  "_note": "Exploratory addendum analyses (component discrimination and subgroup calibration) for the detection manuscript; not adjusted for multiplicity.",
+  "model": "XGBoost (300 trees, depth 4, lr 0.05, subsample/colsample 0.8, seed 42)",
+  "overall_auc_composite_ckd": 0.8099,
+  "n_test": 5801,
+  "n_ckd": 1017,
+  "component_auc": {
+    "egfr_lt60": {
+      "n_assessable": 5107,
+      "n_positive": 443,
+      "auc": 0.8533
+    },
+    "uacr_ge30": {
+      "n_assessable": 5334,
+      "n_positive": 732,
+      "auc": 0.7505
+    }
+  },
+  "subgroup_calibration": {
+    "age_18_44": {
+      "n": 2327,
+      "events": 147,
+      "calibration_slope": 0.768,
+      "calibration_intercept": 0.0107,
+      "observed_expected_ratio": 0.926
+    },
+    "age_45_64": {
+      "n": 1974,
+      "events": 318,
+      "calibration_slope": 0.903,
+      "calibration_intercept": 0.0186,
+      "observed_expected_ratio": 1.022
+    },
+    "age_65plus": {
+      "n": 1500,
+      "events": 552,
+      "calibration_slope": 0.945,
+      "calibration_intercept": 0.0231,
+      "observed_expected_ratio": 1.009
+    },
+    "sex_M": {
+      "n": 2840,
+      "events": 496,
+      "calibration_slope": 0.938,
+      "calibration_intercept": 0.0131,
+      "observed_expected_ratio": 1.014
+    },
+    "sex_F": {
+      "n": 2961,
+      "events": 521,
+      "calibration_slope": 0.975,
+      "calibration_intercept": 0.002,
+      "observed_expected_ratio": 0.986
+    },
+    "race_white": {
+      "n": 2018,
+      "events": 382,
+      "calibration_slope": 0.946,
+      "calibration_intercept": 0.0031,
+      "observed_expected_ratio": 0.962
+    },
+    "race_black": {
+      "n": 1328,
+      "events": 287,
+      "calibration_slope": 0.976,
+      "calibration_intercept": 0.0044,
+      "observed_expected_ratio": 0.996
+    },
+    "race_hisp": {
+      "n": 1320,
+      "events": 190,
+      "calibration_slope": 0.999,
+      "calibration_intercept": 0.0029,
+      "observed_expected_ratio": 1.019
+    },
+    "pov_lt1.3": {
+      "n": 1448,
+      "events": 272,
+      "calibration_slope": 0.859,
+      "calibration_intercept": 0.0228,
+      "observed_expected_ratio": 0.978
+    },
+    "pov_ge1.3": {
+      "n": 3527,
+      "events": 619,
+      "calibration_slope": 1.004,
+      "calibration_intercept": 0.0035,
+      "observed_expected_ratio": 1.025
+    }
+  }
+}

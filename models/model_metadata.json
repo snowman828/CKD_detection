@@ -1,0 +1,62 @@
+{
+  "generated_by": "scripts/export_models.py",
+  "source_cohort": "results/cohort.parquet (NHANES 2011–2018)",
+  "train": "NHANES 2011–2012, 2013–2014, 2015–2016",
+  "test": "NHANES 2017–2018",
+  "hyperparameters": {
+    "LR": "LogisticRegression(max_iter=2000, C=0.1)",
+    "XGB": "XGBClassifier(n_estimators=300, max_depth=4, learning_rate=0.05, subsample=0.8, colsample_bytree=0.8, eval_metric=logloss, random_state=42)",
+    "MLP": "MLPClassifier(hidden_layer_sizes=(64,32), alpha=1e-3, max_iter=500, early_stopping=True, random_state=42)"
+  },
+  "library_versions": {
+    "python": "3.11.15",
+    "numpy": "2.4.6",
+    "pandas": "2.3.3",
+    "scikit-learn": "1.9.0",
+    "xgboost": "3.2.0"
+  },
+  "reproduction_check": {
+    "LR": {
+      "auc_recomputed": 0.794308,
+      "auc_published": 0.7943,
+      "abs_diff": 8.22e-06,
+      "pass": true,
+      "max_prob_diff_vs_archive": 0.0,
+      "label_agreement": 1.0
+    },
+    "XGB": {
+      "auc_recomputed": 0.809948,
+      "auc_published": 0.8099,
+      "abs_diff": 4.848e-05,
+      "pass": true,
+      "max_prob_diff_vs_archive": 0.0,
+      "label_agreement": 1.0
+    },
+    "MLP": {
+      "auc_recomputed": 0.769529,
+      "auc_published": 0.7695,
+      "abs_diff": 2.941e-05,
+      "pass": true,
+      "max_prob_diff_vs_archive": 0.0,
+      "label_agreement": 1.0
+    }
+  },
+  "artifacts": {
+    "xgb_model.json": {
+      "sha256": "9dd44429c6a0c09a722df68a568858ced0892d5e7ea949089700f4c02365b4af",
+      "bytes": 598323
+    },
+    "lr_model.joblib": {
+      "sha256": "b6bf58f9d4470ffe4fd75deeb58f0728220c5f6bbcf9b412fcc87cd1952a6523",
+      "bytes": 1647
+    },
+    "mlp_model.joblib": {
+      "sha256": "051bdf7ebae1998a038142e57921652a119aaf8b4c58b091608065607f1b3888",
+      "bytes": 104213
+    },
+    "preprocessing.json": {
+      "sha256": "9a12652f76cdf8137ecd4651dbe683fa405e5620f76a26b7e76976c14ac13774",
+      "bytes": 1628
+    }
+  }
+}
