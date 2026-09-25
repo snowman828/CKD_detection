@@ -1,0 +1,122 @@
+{
+  "note": "P1 statistical addendum (expert-panel items A-phase)",
+  "results": {
+    "calibration_xgb": {
+      "slope": 0.958,
+      "intercept": 0.0073,
+      "ece": 0.0107,
+      "slope_ci": [
+        0.8941,
+        1.0194
+      ],
+      "intercept_ci": [
+        -0.0025,
+        0.0175
+      ],
+      "ece_ci": [
+        0.0084,
+        0.0215
+      ]
+    },
+    "calibration_lr": {
+      "slope": 1.022,
+      "intercept": -0.0041,
+      "ece": 0.0129,
+      "slope_ci": [
+        0.9532,
+        1.0911
+      ],
+      "ece_ci": [
+        0.0101,
+        0.0241
+      ]
+    },
+    "nri_idi": {
+      "vs_clinical_rule": {
+        "nri_continuous": 0.4756,
+        "idi": 0.0631
+      },
+      "vs_logistic": {
+        "nri_continuous": 0.332,
+        "idi": 0.0326
+      },
+      "nri_categorical_vs_rule_thr_0.16": 0.0684,
+      "nri_continuous_ci_vs_rule": [
+        0.4107,
+        0.5414
+      ],
+      "idi_ci_vs_rule": [
+        0.0546,
+        0.072
+      ]
+    },
+    "ops_at_thresholds": {
+      "xgb": {
+        "0.05": {
+          "threshold": 0.05,
+          "sensitivity": 0.9538,
+          "specificity": 0.3123,
+          "ppv": 0.2277,
+          "npv": 0.9695,
+          "flagged_per_1000": 734.4,
+          "tp_per_1000": 167.2,
+          "fp_per_1000": 567.1
+        },
+        "0.1": {
+          "threshold": 0.1,
+          "sensitivity": 0.8476,
+          "specificity": 0.5876,
+          "ppv": 0.3041,
+          "npv": 0.9477,
+          "flagged_per_1000": 488.7,
+          "tp_per_1000": 148.6,
+          "fp_per_1000": 340.1
+        }
+      },
+      "rule": {
+        "0.05": {
+          "threshold": 0.05,
+          "sensitivity": 0.94,
+          "specificity": 0.2176,
+          "ppv": 0.2034,
+          "npv": 0.9446,
+          "flagged_per_1000": 810.0,
+          "tp_per_1000": 164.8,
+          "fp_per_1000": 645.2
+        },
+        "0.1": {
+          "threshold": 0.1,
+          "sensitivity": 0.8653,
+          "specificity": 0.4728,
+          "ppv": 0.2587,
+          "npv": 0.9429,
+          "flagged_per_1000": 586.5,
+          "tp_per_1000": 151.7,
+          "fp_per_1000": 434.8
+        }
+      }
+    },
+    "weighted": {
+      "auc_xgb": 0.7966,
+      "auc_lr": 0.7712,
+      "auc_rule": 0.7602,
+      "auc_xgb_ci_individual": [
+        0.7707,
+        0.8216
+      ],
+      "auc_rule_ci_individual": [
+        0.7345,
+        0.7864
+      ],
+      "auc_xgb_ci_design": [
+        0.7838,
+        0.8093
+      ],
+      "design_cols": {
+        "PSU": 2,
+        "strata": 15
+      },
+      "auc_xgb_ci_design_note": "Clustered bootstrap resampling primary sampling units within strata (NHANES 2017-2018: 2 PSUs in 15 strata); 1,000 resamples. The design-based interval is narrower than the individual-level bootstrap because between-PSU variance in this single cycle is small."
+    }
+  }
+}

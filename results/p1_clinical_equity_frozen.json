@@ -1,0 +1,510 @@
+{
+  "note": "P1 clinical/equity addendum (expert-panel items A-phase)",
+  "results": {
+    "recalibration": {
+      "before": {
+        "slope": 0.958,
+        "intercept": 0.0073,
+        "ece": 0.0107
+      },
+      "after_cv": {
+        "slope": 0.991,
+        "intercept": 0.0015,
+        "ece": 0.0084,
+        "auc_unchanged": 0.8099
+      },
+      "mlp": {
+        "auc": 0.7695,
+        "before_slope": 1.1,
+        "before_ece": 0.0463,
+        "after_cv_slope": 0.988,
+        "after_cv_ece": 0.0128
+      }
+    },
+    "fdr": {
+      "method": "Benjamini-Hochberg on 10 subgroup bootstrap P values (one-sided P(delta<=0))",
+      "items": [
+        {
+          "subgroup": "sex_F",
+          "delta_auc": 0.0201,
+          "p_raw": 0.0,
+          "p_bh": 0.0,
+          "significant_0.05_after_bh": true
+        },
+        {
+          "subgroup": "age_65plus",
+          "delta_auc": 0.0267,
+          "p_raw": 0.001,
+          "p_bh": 0.005,
+          "significant_0.05_after_bh": true
+        },
+        {
+          "subgroup": "pov_lt1.3",
+          "delta_auc": 0.0238,
+          "p_raw": 0.0028,
+          "p_bh": 0.0093,
+          "significant_0.05_after_bh": true
+        },
+        {
+          "subgroup": "race_white",
+          "delta_auc": 0.0152,
+          "p_raw": 0.0032,
+          "p_bh": 0.008,
+          "significant_0.05_after_bh": true
+        },
+        {
+          "subgroup": "pov_ge1.3",
+          "delta_auc": 0.011,
+          "p_raw": 0.0044,
+          "p_bh": 0.0088,
+          "significant_0.05_after_bh": true
+        },
+        {
+          "subgroup": "sex_M",
+          "delta_auc": 0.0092,
+          "p_raw": 0.0232,
+          "p_bh": 0.0387,
+          "significant_0.05_after_bh": true
+        },
+        {
+          "subgroup": "age_18_44",
+          "delta_auc": 0.0392,
+          "p_raw": 0.0254,
+          "p_bh": 0.0363,
+          "significant_0.05_after_bh": true
+        },
+        {
+          "subgroup": "age_45_64",
+          "delta_auc": 0.0155,
+          "p_raw": 0.035,
+          "p_bh": 0.0438,
+          "significant_0.05_after_bh": true
+        },
+        {
+          "subgroup": "race_black",
+          "delta_auc": 0.0102,
+          "p_raw": 0.0628,
+          "p_bh": 0.0698,
+          "significant_0.05_after_bh": false
+        },
+        {
+          "subgroup": "race_hisp",
+          "delta_auc": 0.0093,
+          "p_raw": 0.1482,
+          "p_bh": 0.1482,
+          "significant_0.05_after_bh": false
+        }
+      ],
+      "n_significant_raw": 8,
+      "n_significant_bh": 8
+    },
+    "bias_analysis": {
+      "basis": "uACR-positive participants at 30-49 mg/g (nearest the KDIGO threshold) treated as non-persistent in scenario analyses",
+      "uacr_positive_n": 732,
+      "near_threshold_n": 225,
+      "near_threshold_fraction": 0.3074,
+      "base": {
+        "auc": 0.8099,
+        "sens": 0.7443,
+        "spec": 0.7352,
+        "ppv": 0.374,
+        "npv": 0.9312,
+        "flagged_per1000": 348.9,
+        "tp_per1000": 130.5,
+        "fp_per1000": 218.4
+      },
+      "scenarios": [
+        {
+          "scenario": "all near-threshold uACR positives treated as transient (upper-bound)",
+          "reclassified_n": 225,
+          "auc": 0.8204,
+          "ppv": 0.3034,
+          "npv": 0.9529,
+          "tp_per1000": 105.8,
+          "fp_per1000": 243.1,
+          "nns_per_case": 3.3
+        },
+        {
+          "scenario": "half of near-threshold uACR positives treated as transient",
+          "reclassified_n": 112,
+          "auc": 0.8155,
+          "ppv": 0.3424,
+          "npv": 0.9439,
+          "tp_per1000": 119.5,
+          "fp_per1000": 229.4,
+          "nns_per_case": 2.9
+        }
+      ]
+    },
+    "non_assessable_profile": {
+      "cohort": {
+        "n": 23578,
+        "age_mean": 48.4,
+        "female_pct": 51.1,
+        "diabetes_pct": 13.4,
+        "bmi_mean": 29.1,
+        "sbp_mean": 124.8,
+        "poverty_lt1.3_pct": 30.2
+      },
+      "non_assessable": {
+        "n": 1233,
+        "age_mean": 49.6,
+        "female_pct": 50.5,
+        "diabetes_pct": 11.6,
+        "bmi_mean": 28.0,
+        "sbp_mean": 127.4,
+        "poverty_lt1.3_pct": 26.8
+      },
+      "assessable": {
+        "n": 22345,
+        "age_mean": 48.3,
+        "female_pct": 51.1,
+        "diabetes_pct": 13.5,
+        "bmi_mean": 29.2,
+        "sbp_mean": 124.8,
+        "poverty_lt1.3_pct": 30.4
+      },
+      "note": "Participants without an assessable eGFR or uACR cannot have CKD status determined; they were retained as CKD-negative in the primary analysis."
+    },
+    "weighted_calibration_dca": {
+      "slope": 0.944,
+      "intercept": 0.001,
+      "ece": 0.0121,
+      "dca": {
+        "0.10": {
+          "nb_model": 0.0741,
+          "nb_screen_all": 0.0414,
+          "delta_nb": 0.0328
+        },
+        "0.20": {
+          "nb_model": 0.0494,
+          "nb_screen_all": -0.0784,
+          "delta_nb": 0.1279
+        }
+      },
+      "window_model_gt_screen_all": [
+        0.05,
+        0.25
+      ],
+      "unweighted_reference": {
+        "slope": 0.958,
+        "ece": 0.0107
+      }
+    },
+    "subgroup_ppv": {
+      "threshold": 0.1602,
+      "items": [
+        {
+          "subgroup": "Age 18–44 y",
+          "n": 2327,
+          "events": 147,
+          "ppv": 0.1594,
+          "npv": 0.9429,
+          "sens": 0.1497,
+          "spec": 0.9468,
+          "flagged_per1000": 59.3
+        },
+        {
+          "subgroup": "Age 45–64 y",
+          "n": 1974,
+          "events": 318,
+          "ppv": 0.3077,
+          "npv": 0.9109,
+          "sens": 0.6289,
+          "spec": 0.7283,
+          "flagged_per1000": 329.3
+        },
+        {
+          "subgroup": "Age ≥65 y",
+          "n": 1500,
+          "events": 552,
+          "ppv": 0.4328,
+          "npv": 0.9356,
+          "sens": 0.9692,
+          "spec": 0.2605,
+          "flagged_per1000": 824.0
+        },
+        {
+          "subgroup": "Male",
+          "n": 2840,
+          "events": 496,
+          "ppv": 0.3861,
+          "npv": 0.9389,
+          "sens": 0.7722,
+          "spec": 0.7402,
+          "flagged_per1000": 349.3
+        },
+        {
+          "subgroup": "Female",
+          "n": 2961,
+          "events": 521,
+          "ppv": 0.3624,
+          "npv": 0.9238,
+          "sens": 0.7179,
+          "spec": 0.7303,
+          "flagged_per1000": 348.5
+        },
+        {
+          "subgroup": "White",
+          "n": 2018,
+          "events": 382,
+          "ppv": 0.4015,
+          "npv": 0.945,
+          "sens": 0.822,
+          "spec": 0.7139,
+          "flagged_per1000": 387.5
+        },
+        {
+          "subgroup": "Black",
+          "n": 1328,
+          "events": 287,
+          "ppv": 0.3647,
+          "npv": 0.9128,
+          "sens": 0.784,
+          "spec": 0.6234,
+          "flagged_per1000": 464.6
+        },
+        {
+          "subgroup": "Hispanic",
+          "n": 1320,
+          "events": 190,
+          "ppv": 0.3565,
+          "npv": 0.9355,
+          "sens": 0.6737,
+          "spec": 0.7956,
+          "flagged_per1000": 272.0
+        },
+        {
+          "subgroup": "Poverty-income ratio <1.3",
+          "n": 1448,
+          "events": 272,
+          "ppv": 0.3734,
+          "npv": 0.9202,
+          "sens": 0.7316,
+          "spec": 0.716,
+          "flagged_per1000": 368.1
+        },
+        {
+          "subgroup": "Poverty-income ratio ≥1.3",
+          "n": 3527,
+          "events": 619,
+          "ppv": 0.3855,
+          "npv": 0.9347,
+          "sens": 0.7561,
+          "spec": 0.7435,
+          "flagged_per1000": 344.2
+        }
+      ]
+    },
+    "fairness_thresholds": {
+      "development_derived_thresholds": {
+        "18–44": 0.075,
+        "45–64": 0.17,
+        "65+": 0.425
+      },
+      "global_threshold": 0.1602,
+      "equalized_sensitivity_thresholds": {
+        "18–44": 0.072,
+        "45–64": 0.13,
+        "65+": 0.36
+      },
+      "evaluation": [
+        {
+          "strategy": "single global threshold",
+          "per_band": [
+            {
+              "band": "18–44",
+              "sens": 0.1497,
+              "spec": 0.9468,
+              "ppv": 0.1594,
+              "npv": 0.9429,
+              "flagged_per1000": 59.3,
+              "tp_per1000": 9.5,
+              "fp_per1000": 49.8
+            },
+            {
+              "band": "45–64",
+              "sens": 0.6289,
+              "spec": 0.7283,
+              "ppv": 0.3077,
+              "npv": 0.9109,
+              "flagged_per1000": 329.3,
+              "tp_per1000": 101.3,
+              "fp_per1000": 228.0
+            },
+            {
+              "band": "65+",
+              "sens": 0.9692,
+              "spec": 0.2605,
+              "ppv": 0.4328,
+              "npv": 0.9356,
+              "flagged_per1000": 824.0,
+              "tp_per1000": 356.7,
+              "fp_per1000": 467.3
+            }
+          ],
+          "global_sens": 0.7443,
+          "global_spec": 0.7352,
+          "global_flagged_per1000": 348.9,
+          "nb_at_10pct": 0.1062,
+          "nb_at_20pct": 0.0759
+        },
+        {
+          "strategy": "age-band-specific Youden thresholds (development-derived)",
+          "per_band": [
+            {
+              "band": "18–44",
+              "sens": 0.5442,
+              "spec": 0.7229,
+              "ppv": 0.117,
+              "npv": 0.9592,
+              "flagged_per1000": 293.9,
+              "tp_per1000": 34.4,
+              "fp_per1000": 259.6
+            },
+            {
+              "band": "45–64",
+              "sens": 0.6006,
+              "spec": 0.7476,
+              "ppv": 0.3136,
+              "npv": 0.907,
+              "flagged_per1000": 308.5,
+              "tp_per1000": 96.8,
+              "fp_per1000": 211.8
+            },
+            {
+              "band": "65+",
+              "sens": 0.5924,
+              "spec": 0.7595,
+              "ppv": 0.5892,
+              "npv": 0.7619,
+              "flagged_per1000": 370.0,
+              "tp_per1000": 218.0,
+              "fp_per1000": 152.0
+            }
+          ],
+          "global_sens": 0.588,
+          "global_spec": 0.7387,
+          "global_flagged_per1000": 318.6,
+          "nb_at_10pct": 0.0791,
+          "nb_at_20pct": 0.0492
+        },
+        {
+          "strategy": "age-band thresholds equalising development-set sensitivity",
+          "per_band": [
+            {
+              "band": "18–44",
+              "sens": 0.5646,
+              "spec": 0.7046,
+              "ppv": 0.1142,
+              "npv": 0.96,
+              "flagged_per1000": 312.4,
+              "tp_per1000": 35.7,
+              "fp_per1000": 276.8
+            },
+            {
+              "band": "45–64",
+              "sens": 0.7233,
+              "spec": 0.6208,
+              "ppv": 0.2681,
+              "npv": 0.9211,
+              "flagged_per1000": 434.7,
+              "tp_per1000": 116.5,
+              "fp_per1000": 318.1
+            },
+            {
+              "band": "65+",
+              "sens": 0.7083,
+              "spec": 0.6519,
+              "ppv": 0.5423,
+              "npv": 0.7933,
+              "flagged_per1000": 480.7,
+              "tp_per1000": 260.7,
+              "fp_per1000": 220.0
+            }
+          ],
+          "global_sens": 0.6922,
+          "global_spec": 0.6651,
+          "global_flagged_per1000": 397.5,
+          "nb_at_10pct": 0.0907,
+          "nb_at_20pct": 0.0523
+        }
+      ]
+    },
+    "intersectional": {
+      "items": [
+        {
+          "cell": "Age 18–44 y & PIR <1.3",
+          "n": 690,
+          "events": 51,
+          "auc": 0.6657,
+          "ci95": [
+            0.5912,
+            0.74
+          ]
+        },
+        {
+          "cell": "Age 18–44 y & PIR ≥1.3",
+          "n": 1313,
+          "events": 77,
+          "auc": 0.7134,
+          "ci95": [
+            0.6549,
+            0.7718
+          ]
+        },
+        {
+          "cell": "Age ≥45 y & PIR <1.3",
+          "n": 758,
+          "events": 221,
+          "auc": 0.7331,
+          "ci95": [
+            0.695,
+            0.7696
+          ]
+        },
+        {
+          "cell": "Age ≥45 y & PIR ≥1.3",
+          "n": 2214,
+          "events": 542,
+          "auc": 0.7967,
+          "ci95": [
+            0.7761,
+            0.8174
+          ]
+        }
+      ]
+    },
+    "clinical_impact": {
+      "screened_per_1000": 1000,
+      "model_triage": {
+        "sens": 0.7443,
+        "spec": 0.7352,
+        "ppv": 0.374,
+        "npv": 0.9312,
+        "flagged_per1000": 348.9,
+        "tp_per1000": 130.5,
+        "fp_per1000": 218.4
+      },
+      "detected_with_albuminuria_preserved_egfr_per1000": 57.7,
+      "detected_with_albuminuria_per1000": 87.6,
+      "sglt2i_eligibility_proxy_per1000": 50.7,
+      "sglt2i_proxy_definition": "uACR >=200 mg/g, or diabetes with uACR >=30 mg/g, both with eGFR >=20 mL/min/1.73 m2 (proxy, not a formal eligibility assessment)",
+      "screen_all_age60plus": {
+        "sens": 1.0,
+        "spec": 0.0,
+        "ppv": 0.3195,
+        "npv": 0.0,
+        "flagged_per1000": 1000.0,
+        "tp_per1000": 319.5,
+        "fp_per1000": 680.5,
+        "share_of_cohort_per1000": 371,
+        "share_of_cohort_fraction": 0.371
+      },
+      "efficiency_flagged_per_detected_case": {
+        "model": 2.7,
+        "screen_all_age60plus": 3.1
+      }
+    }
+  }
+}

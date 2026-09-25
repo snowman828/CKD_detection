@@ -40,3 +40,7 @@ indicators). Four indicators (`miss_race_*`, `miss_female`) are constant zero be
 had no missing values in these NHANES cycles.
 
 No protected health information is included; all inputs derive from public NHANES files.
+
+## Environment and version drift
+
+The exact library versions used for training are recorded in `model_metadata.json` (Python, NumPy, pandas, scikit-learn, XGBoost). Serialised model files (`*.joblib`, `*.json`) are not guaranteed to load across major library versions; if your environment differs substantially, retrain from `scripts/modeling.py` (the pipeline is deterministic under the recorded seeds) rather than reusing the binaries.

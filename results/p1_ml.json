@@ -1,0 +1,141 @@
+{
+  "note": "P1 machine-learning addendum (expert-panel items A-phase)",
+  "results": {
+    "shap": {
+      "model": "models/xgb_model.json (published artifact)",
+      "auc_export": 0.8099,
+      "top_features": [
+        {
+          "feature": "age",
+          "mean_abs_shap": 0.6271,
+          "share_pct": 27.7
+        },
+        {
+          "feature": "sbp",
+          "mean_abs_shap": 0.275,
+          "share_pct": 12.2
+        },
+        {
+          "feature": "hba1c",
+          "mean_abs_shap": 0.231,
+          "share_pct": 10.2
+        },
+        {
+          "feature": "bmi",
+          "mean_abs_shap": 0.1403,
+          "share_pct": 6.2
+        },
+        {
+          "feature": "female",
+          "mean_abs_shap": 0.1376,
+          "share_pct": 6.1
+        },
+        {
+          "feature": "diabetes",
+          "mean_abs_shap": 0.1159,
+          "share_pct": 5.1
+        },
+        {
+          "feature": "poverty_ratio",
+          "mean_abs_shap": 0.11,
+          "share_pct": 4.9
+        },
+        {
+          "feature": "hdl",
+          "mean_abs_shap": 0.1013,
+          "share_pct": 4.5
+        }
+      ],
+      "n_features": 28,
+      "figure": "figures/fig_shap_attribution.pdf"
+    },
+    "feature_ladder": {
+      "items": [
+        {
+          "model": "age only",
+          "n_inputs": 1,
+          "auc": 0.7393,
+          "delta_vs_full": -0.0707,
+          "delta_vs_full_ci": [
+            -0.0822,
+            -0.0587
+          ]
+        },
+        {
+          "model": "3 variables (age, diabetes, SBP)",
+          "n_inputs": 3,
+          "auc": 0.7742,
+          "delta_vs_full": -0.0358,
+          "delta_vs_full_ci": [
+            -0.0452,
+            -0.0267
+          ]
+        },
+        {
+          "model": "5 variables (+ BMI, HbA1c)",
+          "n_inputs": 5,
+          "auc": 0.7942,
+          "delta_vs_full": -0.0157,
+          "delta_vs_full_ci": [
+            -0.0218,
+            -0.0095
+          ]
+        },
+        {
+          "model": "8 variables (+ DBP, total cholesterol, HDL)",
+          "n_inputs": 8,
+          "auc": 0.7973,
+          "delta_vs_full": -0.0126,
+          "delta_vs_full_ci": [
+            -0.0181,
+            -0.0075
+          ]
+        },
+        {
+          "model": "12 variables (no missingness indicators)",
+          "n_inputs": 14,
+          "auc": 0.8046,
+          "delta_vs_full": -0.0053,
+          "delta_vs_full_ci": [
+            -0.0079,
+            -0.0028
+          ]
+        },
+        {
+          "model": "12 variables + missingness indicators (primary model)",
+          "n_inputs": 28,
+          "auc": 0.8099,
+          "delta_vs_full": 0.0,
+          "delta_vs_full_ci": [
+            0.0,
+            0.0
+          ]
+        }
+      ]
+    },
+    "missingness_perturbation": {
+      "baseline_auc": 0.8099,
+      "all_clinical_inputs_missing_auc": 0.5,
+      "random_50pct_cells_missing_auc": 0.5576,
+      "single_feature_ablation_delta_auc": {
+        "age": 0.0851,
+        "hba1c": 0.0459,
+        "sbp": 0.0286,
+        "total_cholesterol": 0.0241,
+        "dbp": 0.0194,
+        "hdl": 0.0091,
+        "diabetes": 0.0089,
+        "bmi": 0.0083,
+        "race_black": 0.0033,
+        "female": 0.0027,
+        "poverty_ratio": 0.0026,
+        "race_hisp": 0.0011,
+        "education": 0.0008,
+        "race_other": 0.0003
+      },
+      "all_clinical_inputs_missing_delta": -0.3099,
+      "age_only_available_auc": 0.6994,
+      "_fix_note": "此前的 all_clinical_inputs_missing_auc=0.8099 系脚本自身覆盖错误（等于基线），已按真实全缺矩阵重算"
+    }
+  }
+}

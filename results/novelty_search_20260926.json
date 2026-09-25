@@ -1,0 +1,103 @@
+{
+  "date": "2026-09-26",
+  "database": "OpenAlex API (https://api.openalex.org)",
+  "proxy": "socks5h://127.0.0.1:10808",
+  "queries": [
+    {
+      "label": "routine clinical data AND chronic kidney disease AND detection",
+      "query": "chronic kidney disease routine clinical data detection machine learning",
+      "hits": 17230,
+      "top": [
+        {
+          "title": "Chronic kidney disease prediction based on machine learning algorithms",
+          "year": 2023,
+          "doi": "10.1016/j.jpi.2023.100189"
+        },
+        {
+          "title": "Comparison and development of machine learning tools in the prediction of chronic kidney disease progression",
+          "year": 2019,
+          "doi": "10.1186/s12967-019-1860-0"
+        },
+        {
+          "title": "Machine learning for clinical decision support in infectious diseases: a narrative review of current applicati",
+          "year": 2019,
+          "doi": "10.1016/j.cmi.2019.09.009"
+        },
+        {
+          "title": "Machine-Learning-Based Disease Diagnosis: A Comprehensive Review",
+          "year": 2022,
+          "doi": "10.3390/healthcare10030541"
+        },
+        {
+          "title": "Global incidence, prevalence, years lived with disability (YLDs), disability-adjusted life-years (DALYs), and ",
+          "year": 2024,
+          "doi": "10.1016/s0140-6736(24)00757-8"
+        }
+      ]
+    },
+    {
+      "label": "performance ceiling of non-kidney-specific data",
+      "query": "chronic kidney disease detection non-kidney-specific routine data performance",
+      "hits": 39759,
+      "top": [
+        {
+          "title": "Chronic kidney disease and the global public health agenda: an international consensus",
+          "year": 2024,
+          "doi": "10.1038/s41581-024-00820-6"
+        },
+        {
+          "title": "Acute kidney injury",
+          "year": 2021,
+          "doi": "10.1038/s41572-021-00284-z"
+        },
+        {
+          "title": "Chronic Kidney Disease and Coronary Artery Disease",
+          "year": 2019,
+          "doi": "10.1016/j.jacc.2019.08.1017"
+        },
+        {
+          "title": "2021 ESC Guidelines for the diagnosis and treatment of acute and chronic heart failure",
+          "year": 2021,
+          "doi": "10.1093/eurheartj/ehab368"
+        },
+        {
+          "title": "A Synopsis of the Evidence for the Science and Clinical Management of Cardiovascular-Kidney-Metabolic (CKM) Sy",
+          "year": 2023,
+          "doi": "10.1161/cir.0000000000001186"
+        }
+      ]
+    },
+    {
+      "label": "external temporal validation CKD machine learning",
+      "query": "chronic kidney disease machine learning external temporal validation",
+      "hits": 9036,
+      "top": [
+        {
+          "title": "An Empirical Evaluation of Machine Learning Techniques for Chronic Kidney Disease Prophecy",
+          "year": 2020,
+          "doi": "10.1109/access.2020.2981689"
+        },
+        {
+          "title": "External validation of prognostic models: what, why, how, when and where?",
+          "year": 2020,
+          "doi": "10.1093/ckj/sfaa188"
+        },
+        {
+          "title": "A Deep Neural Network for Early Detection and Prediction of Chronic Kidney Disease",
+          "year": 2022,
+          "doi": "10.3390/diagnostics12010116"
+        },
+        {
+          "title": "Predict, diagnose, and treat chronic kidney disease with machine learning: a systematic literature review",
+          "year": 2023,
+          "doi": "10.1007/s40620-023-01573-4"
+        },
+        {
+          "title": "Multimodal machine learning in precision health: A scoping review",
+          "year": 2022,
+          "doi": "10.1038/s41746-022-00712-8"
+        }
+      ]
+    }
+  ]
+}
