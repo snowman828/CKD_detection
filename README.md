@@ -74,3 +74,7 @@ MIT (see `LICENSE`).
 ## Additional analysis: independent-era external validation
 
 `scripts/p2_independent_era.py` applies the frozen development models, imputation parameters, feature set and operating threshold unchanged to NHANES 2007-2008 and 2009-2010 (n=12,630; 2,048 CKD events), cycles collected 4-10 years before the development period and never used for development, threshold derivation or model selection. Results: `results/p2_independent_era.json`.
+
+## Phase C (prepared): cross-system external validation on KNHANES
+
+`scripts/p3_knh_validation.py` applies the frozen development models, imputation parameters, feature set and operating threshold unchanged to an independent national survey from a different health system (KNHANES, Korea). Guard rails: (i) an internal consistency gate that must reproduce the published NHANES 2017-2018 AUC (0.8099) before any external evaluation; (ii) a urine-albumin/creatinine unit gate that aborts if the implied uACR distribution is biologically implausible, so no suspicious numbers are produced; (iii) automatic KNHANES variable detection with a printed mapping. The script is smoke-tested end to end on synthetic data; no KNHANES results are included because the KNHANES micro-data are distributed behind an email/agreement form (KDCA) or a login (KISTI) and must be obtained by a human.
