@@ -162,7 +162,7 @@ fig.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.52, 0.012),
            ncol=4, frameon=False, fontsize=7, handletextpad=0.5, columnspacing=1.1,
            title="CKM pathway", title_fontsize=7)
 
-fig.savefig(os.path.join(OUT, "figure1_substudy1.png"), dpi=300, bbox_inches="tight", facecolor="white")
+fig.savefig(os.path.join(OUT, "figure1_substudy1.png"), dpi=400, bbox_inches="tight", facecolor="white")
 fig.savefig(os.path.join(OUT, "figure1_substudy1.pdf"), bbox_inches="tight", facecolor="white")
 plt.close(fig)
 print("已保存: figure1_substudy1.png / .pdf（新版式）")
@@ -243,7 +243,7 @@ handles += [Line2D([0], [0], color="#888888", ls="--", lw=1.2, label="Clinical t
 fig.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, -0.015), ncol=3,
            frameon=False, fontsize=7, handletextpad=0.4, columnspacing=1.0)
 fig.subplots_adjust(left=0.27, right=0.985, top=0.90, bottom=0.20)
-fig.savefig(os.path.join(OUT, "figure2_forest.png"), dpi=300, bbox_inches="tight", facecolor="white")
+fig.savefig(os.path.join(OUT, "figure2_forest.png"), dpi=400, bbox_inches="tight", facecolor="white")
 fig.savefig(os.path.join(OUT, "figure2_forest.pdf"), bbox_inches="tight", facecolor="white")
 plt.close(fig)
 print("已保存: figure2_forest.png / .pdf（全英文标签 + 图例下置）")
@@ -305,7 +305,7 @@ ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.22), ncol=2, frameon=False
           fontsize=7, handlelength=1.1, handletextpad=0.45, columnspacing=0.9,
           title="Case severity spectrum", title_fontsize=7)
 fig.subplots_adjust(left=0.13, right=0.985, top=0.90, bottom=0.32)
-fig.savefig(os.path.join(OUT, "figure3_spectrum.png"), dpi=300, bbox_inches="tight", facecolor="white")
+fig.savefig(os.path.join(OUT, "figure3_spectrum.png"), dpi=400, bbox_inches="tight", facecolor="white")
 fig.savefig(os.path.join(OUT, "figure3_spectrum.pdf"), bbox_inches="tight", facecolor="white")
 plt.close(fig)
 print("已保存: figure3_spectrum.png / .pdf（图例移出坐标区）")
