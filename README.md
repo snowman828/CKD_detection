@@ -69,3 +69,8 @@ This secondary analysis used de-identified public-use files and required no addi
 
 ## Licence
 MIT (see `LICENSE`).
+
+
+## Additional analysis: independent-era external validation
+
+`scripts/p2_independent_era.py` applies the frozen development models, imputation parameters, feature set and operating threshold unchanged to NHANES 2007-2008 and 2009-2010 (n=12,630; 2,048 CKD events), cycles collected 4-10 years before the development period and never used for development, threshold derivation or model selection. Results: `results/p2_independent_era.json`.

@@ -1,0 +1,70 @@
+{
+  "_note": "Independent-era external validation (NHANES 2007-2008 and 2009-2010; never used for development, threshold derivation or model selection). Models are identical to the primary analysis (trained on 2011/2013/2015); the 2017-2018 external validation reproduces the published AUC (0.8099) as an internal consistency check.",
+  "cohort": {
+    "n": 12630,
+    "events": 2048,
+    "prevalence_pct": 16.22,
+    "cycles": {
+      "E": 6171,
+      "F": 6459
+    },
+    "age_mean": 48.9,
+    "female_pct": 50.6,
+    "diabetes_pct": 12.0,
+    "egfr_median": 98.2,
+    "uacr_median": 7.0
+  },
+  "discrimination": {
+    "xgb": 0.8131,
+    "xgb_ci": [
+      0.8029,
+      0.823
+    ],
+    "lr": 0.7886,
+    "lr_ci": [
+      0.7773,
+      0.7994
+    ],
+    "age_only": 0.7403,
+    "age_only_ci": [
+      0.7285,
+      0.7525
+    ],
+    "clinical_rule": 0.7712,
+    "clinical_rule_ci": [
+      0.7593,
+      0.7827
+    ],
+    "weighted_xgb": 0.7996
+  },
+  "calibration": {
+    "slope": 0.952,
+    "intercept": 0.0023,
+    "ece": 0.0096
+  },
+  "operating": {
+    "threshold": 0.1602,
+    "xgb": {
+      "sensitivity": 0.7246,
+      "specificity": 0.7606,
+      "ppv": 0.3694,
+      "npv": 0.9345,
+      "flagged_per1000": 318.1,
+      "tp_per1000": 117.5
+    }
+  },
+  "decision_curve": {
+    "at_10pct": {
+      "nb_model": 0.0991,
+      "nb_screen_all": 0.0691
+    },
+    "at_20pct": {
+      "nb_model": 0.0695,
+      "nb_screen_all": -0.0473
+    },
+    "window_model_gt_all": [
+      0.05,
+      0.25
+    ]
+  }
+}
