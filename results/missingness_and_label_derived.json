@@ -1,0 +1,19 @@
+{
+ "source": {
+  "missingness": "09_无湿实验执行/results/p1_ml.json",
+  "equity": "09_无湿实验执行/results/p1_clinical_equity.json"
+ },
+ "sha256": {
+  "09_无湿实验执行/results/p1_ml.json": "ab92959ec8e4bf12",
+  "09_无湿实验执行/results/p1_clinical_equity.json": "3ba47da98ca45eaf",
+  "p1_ml.json": "ab92959ec8e4bf12"
+ },
+ "random_50pct_cells_missing_delta": -0.2523,
+ "age_only_available_delta": -0.1105,
+ "flags_per_detected_case_base": 2.674,
+ "near_threshold_n": 225,
+ "uacr_positive_n": 732,
+ "near_threshold_fraction": 0.3074,
+ "no_indicator_model_auc": 0.8046,
+ "no_indicator_delta_vs_primary": -0.0053
+}

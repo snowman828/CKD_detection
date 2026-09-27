@@ -13,8 +13,8 @@ from sklearn.linear_model import LogisticRegression
 from xgboost import XGBClassifier, DMatrix
 
 t0 = time.time(); RNG = 2026
-RES = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results"
-REPO = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/repo_public_push_ready"
+RES = r"results"
+REPO = r"repo_public_push_ready"
 FEATURES = ["age", "sex", "race", "poverty_ratio", "education", "bmi", "sbp", "dbp", "hba1c", "diabetes", "total_cholesterol", "hdl"]
 cohort = pd.read_parquet(os.path.join(RES, "cohort.parquet"))
 train = cohort[cohort["year"].isin([2011, 2013, 2015])].copy()

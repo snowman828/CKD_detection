@@ -138,8 +138,8 @@ def md_to_docx(md_path, out_path, figure_map=None):
             full = os.path.join(os.path.dirname(md_path), path) if not os.path.isabs(path) else path
             if not os.path.exists(full):
                 # 尝试相对 09 目录 / 项目根
-                for base in [r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行",
-                             r"G:/项目文件/CKD多模态AI早诊_本项目专属归档"]:
+                for base in [r"09_",
+                             r""]:
                     alt = os.path.join(base, path)
                     if os.path.exists(alt):
                         full = alt; break

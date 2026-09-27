@@ -12,7 +12,7 @@ from scipy.cluster.hierarchy import linkage, fcluster
 from scipy.spatial.distance import squareform
 from sklearn.metrics import adjusted_rand_score
 
-OUT = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results"
+OUT = r"results"
 M2OUT = os.path.join(OUT, "m2"); os.makedirs(M2OUT, exist_ok=True)
 cohort = pd.read_parquet(os.path.join(OUT, "cohort.parquet"))
 

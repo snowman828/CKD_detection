@@ -4,7 +4,7 @@
 """
 import re, sys
 
-SRC = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/论文/MACKI_Dry_Manuscript_FINAL_投稿完整版.md"
+SRC = r"论文/MACKI_Dry_Manuscript_FINAL_投稿完整版.md"
 
 SUP = {'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9'}
 REV = {v:k for k,v in SUP.items()}

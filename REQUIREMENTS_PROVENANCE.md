@@ -13,4 +13,4 @@
 - `seaborn（未取到版本）← import 命中`
 - `xgboost==3.2.0   ← import 命中`
 
-版本号取自本机科学环境（`uv pip list --python D:/hermes/scienv/Scripts/python.exe`）。
+版本号取自本机科学环境（`uv pip list --python `）。

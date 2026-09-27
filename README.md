@@ -57,7 +57,6 @@ results/          machine-readable result summaries (JSON); parquet data files a
 analysis_plan/    pre-specified analysis plan (protocol; the study was not registered)
 requirements.txt  dependencies (derived from imports)
 DATA_AVAILABILITY.md  data sources, ethics facts, what is not redistributed
-PUSH_GUIDE.md     (Chinese) how the author pushes this local repository to GitHub
 CITATION.cff      citation metadata (fill in ORCID/DOI/repository URL)
 LICENSE           MIT
 ```

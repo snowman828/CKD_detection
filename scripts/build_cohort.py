@@ -5,8 +5,8 @@
 """
 import pandas as pd, numpy as np, os, json
 
-DATA = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/data"
-OUT  = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results"
+DATA = r"data"
+OUT  = r"results"
 os.makedirs(OUT, exist_ok=True)
 
 CYCLES = {"G": 2011, "H": 2013, "I": 2015, "J": 2017}   # H=2013-2014（审稿修复：消除 cherry-picking 质疑）

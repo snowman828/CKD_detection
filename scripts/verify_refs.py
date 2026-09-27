@@ -48,5 +48,5 @@ for ref in REFS:
     time.sleep(0.4)
 
 print(json.dumps(report, ensure_ascii=False, indent=1))
-with open(r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results/ref_verification_raw.json", "w", encoding="utf-8") as f:
+with open(r"results/ref_verification_raw.json", "w", encoding="utf-8") as f:
     json.dump(report, f, ensure_ascii=False, indent=1)

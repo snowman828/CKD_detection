@@ -16,7 +16,7 @@ from sklearn.metrics import roc_auc_score, roc_curve, confusion_matrix
 from xgboost import XGBClassifier
 from sklearn.neural_network import MLPClassifier
 
-OUT = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results"
+OUT = r"results"
 cohort = pd.read_parquet(os.path.join(OUT, "cohort.parquet"))
 
 FEATURES = ["age", "sex", "race", "poverty_ratio", "education", "bmi",

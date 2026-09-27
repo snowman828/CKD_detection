@@ -18,7 +18,7 @@ from xgboost import XGBClassifier
 from sklearn.metrics import roc_auc_score
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))       # repo 根
-RES = os.environ.get("MACKI_RESULTS_DIR", r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results")
+RES = os.environ.get("MACKI_RESULTS_DIR", r"results")
 OUT = os.path.join(BASE, "models")
 os.makedirs(OUT, exist_ok=True)
 

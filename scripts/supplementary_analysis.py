@@ -13,7 +13,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-OUT = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results"
+OUT = r"results"
 test = pd.read_parquet(os.path.join(OUT, "test_set.parquet"))
 y = np.load(os.path.join(OUT, "test_y.npy"))
 p_lr = np.load(os.path.join(OUT, "test_proba_lr.npy"))

@@ -4,15 +4,15 @@
 沿用 knh2022_cross_system.py 的冻结流程与预指定 race-blind 口径，仅把 KNHANES 侧扩为三波。
 """
 import os, sys, json, zipfile, glob, numpy as np, pandas as pd, pyreadstat
-sys.path.insert(0, r"G:\项目文件\CKD多模态AI早诊_本项目专属归档\09_无湿实验执行\repo_public_push_ready\scripts")
+sys.path.insert(0, r"repo_public_push_ready\scripts")
 import knh2022_cross_system as M
 from xgboost import XGBClassifier
 from sklearn.metrics import roc_auc_score
 from scipy.optimize import brentq
 from sklearn.linear_model import LogisticRegression
 
-BASE = os.path.join(M.PROJ, r"09_无湿实验执行\data\knh")
-OUT = os.path.join(M.PROJ, r"09_无湿实验执行\results\knh_multiwave_cross_system.json")
+BASE = os.path.join(M.PROJ, r"data\knh")
+OUT = os.path.join(M.PROJ, r"results\knh_multiwave_cross_system.json")
 YEARS = ("2022", "2023", "2024")
 RB = ["age", "sex", "poverty_ratio", "education", "bmi", "sbp", "dbp",
       "hba1c", "diabetes", "total_cholesterol", "hdl"]

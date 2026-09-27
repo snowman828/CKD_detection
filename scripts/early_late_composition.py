@@ -5,7 +5,7 @@
 """
 import pandas as pd, os
 
-BASE = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行"
+BASE = r"09_"
 cohort = pd.read_parquet(os.path.join(BASE, "results/cohort.parquet"))
 test = cohort[cohort["year"] == 2017]
 ckd = test["ckd"] == 1

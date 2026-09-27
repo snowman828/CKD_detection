@@ -16,7 +16,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from xgboost import XGBClassifier
 
-PROJ = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行"
+PROJ = r"09_"
 DATA, OUT = os.path.join(PROJ, "data"), os.path.join(PROJ, "results")
 FEATURES = ["age", "sex", "race", "poverty_ratio", "education", "bmi", "sbp", "dbp", "hba1c", "diabetes", "total_cholesterol", "hdl"]
 RNG, YTHR = 2026, 0.1602

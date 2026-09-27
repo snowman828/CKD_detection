@@ -1,0 +1,17 @@
+{
+  "n_screened": 39156,
+  "n_age_ge18": 23825,
+  "excl_age_lt18": 15331,
+  "excl_pregnant": 247,
+  "excl_no_label_component": 0,
+  "n_analytic": 23578,
+  "by_cycle": {
+    "G": 5807,
+    "H": 6048,
+    "I": 5922,
+    "J": 5801
+  },
+  "n_development_G_I": 17777,
+  "n_temporal_test_J": 5801,
+  "n_ckd": 3855
+}

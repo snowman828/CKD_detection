@@ -2,8 +2,8 @@
 """
 import pandas as pd, numpy as np, os, json
 
-OUT = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results/m2"
-cohort = pd.read_parquet(r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results/cohort.parquet")
+OUT = r"results/m2"
+cohort = pd.read_parquet(r"results/cohort.parquet")
 te = cohort[cohort["year"] == 2017].reset_index(drop=True)
 
 CONT = ["age","bmi","sbp","dbp","hba1c","total_cholesterol","hdl","poverty_ratio"]

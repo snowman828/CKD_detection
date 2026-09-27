@@ -7,8 +7,8 @@
 import pandas as pd, numpy as np, json, os
 from xgboost import XGBClassifier
 
-OUT = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results"
-LMF = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/data/lmf"
+OUT = r"results"
+LMF = r"data/lmf"
 cohort = pd.read_parquet(os.path.join(OUT, "cohort.parquet"))
 
 # ---- 解析 LMF（fixed-width, NHANES 版）----

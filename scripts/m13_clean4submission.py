@@ -4,10 +4,10 @@
 """
 import pandas as pd, re, os
 
-BASE = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档"
-MD = os.path.join(BASE, "09_无湿实验执行/论文/MACKI_Followup_Mechanistic_DRAFT_v1.md")
-OUT_MD = os.path.join(BASE, "09_无湿实验执行/论文/MACKI_Followup_Mechanistic_CLEAN.md")
-CSV = os.path.join(BASE, "09_无湿实验执行/results/m2/table1_baseline.csv")
+BASE = r""
+MD = os.path.join(BASE, "论文/MACKI_Followup_Mechanistic_DRAFT_v1.md")
+OUT_MD = os.path.join(BASE, "论文/MACKI_Followup_Mechanistic_CLEAN.md")
+CSV = os.path.join(BASE, "results/m2/table1_baseline.csv")
 
 # ---- Table 1 从 CSV 程序化生成 ----
 t1 = pd.read_csv(CSV)

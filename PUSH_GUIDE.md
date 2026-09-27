@@ -8,7 +8,7 @@
 
 ## 2. 关联并推送
 ```bash
-cd "G:\项目文件\CKD多模态AI早诊_本项目专属归档\09_无湿实验执行\repo_public_push_ready"
+cd "repo_public_push_ready"
 git remote add origin https://github.com/snowman828/CKD_detection     # https://github.com/snowman828/CKD_detection
 git branch -M main
 git push -u origin main

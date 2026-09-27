@@ -6,8 +6,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-OUT = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results/m2"
-cohort = pd.read_parquet(r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results/cohort.parquet")
+OUT = r"results/m2"
+cohort = pd.read_parquet(r"results/cohort.parquet")
 test = cohort[cohort["year"] == 2017].reset_index(drop=True)
 test["sev"] = np.where(test["egfr"] < 45, "g3b (<45)",
              np.where(test["egfr"] < 60, "g3a (45–60)",

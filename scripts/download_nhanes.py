@@ -1,12 +1,12 @@
 """NHANES CKD 研究数据下载脚本（真实公开数据，无湿实验管道第 1 步）
 周期：2011-2012(G) / 2015-2016(I) / 2017-2018(J) / 2019-2020(K)
 文件：人口学 / 尿白蛋白肌酐 / 血清生化 / 血压 / 身体测量 / 糖尿病问卷 / 糖化血红蛋白
-下载至 G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/data/
+下载至 data/
 """
 import urllib.request, os, sys, time
 
 BASE = "https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/{year}/DataFiles/{fname}"
-DATA_DIR = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/data"
+DATA_DIR = r"data"
 os.makedirs(DATA_DIR, exist_ok=True)
 
 FILES = {

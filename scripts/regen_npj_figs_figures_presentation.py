@@ -10,7 +10,7 @@
 """
 import io, os, shutil, sys, re
 
-ROOT = r"G:\项目文件\CKD多模态AI早诊_本项目专属归档\09_无湿实验执行"
+ROOT = r"09_"
 SCRIPTS = os.path.join(ROOT, "scripts")
 OUT = os.path.join(ROOT, "results", "m2")
 PKG_FIG = os.path.join(ROOT, "投稿包", "02_npjDM_Followup", "figures")

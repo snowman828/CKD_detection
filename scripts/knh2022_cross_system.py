@@ -17,10 +17,10 @@ import os, sys, json, numpy as np, pandas as pd, pyreadstat
 from xgboost import XGBClassifier
 from sklearn.metrics import roc_auc_score
 
-PROJ = r"G:\项目文件\CKD多模态AI早诊_本项目专属归档"
-KNH = os.path.join(PROJ, r"09_无湿实验执行\data\knh\2022")
-DATA = os.path.join(PROJ, r"09_无湿实验执行\data")
-OUT = os.path.join(PROJ, r"09_无湿实验执行\results\knh2022_cross_system.json")
+PROJ = r""
+KNH = os.path.join(PROJ, r"data\knh\2022")
+DATA = os.path.join(PROJ, r"data")
+OUT = os.path.join(PROJ, r"results\knh2022_cross_system.json")
 HYP = dict(n_estimators=300, max_depth=4, learning_rate=0.05, subsample=0.8,
            colsample_bytree=0.8, eval_metric="logloss", n_jobs=4, random_state=42)
 THR = 0.16  # 冻结的部署阈值（开发集 Youden）

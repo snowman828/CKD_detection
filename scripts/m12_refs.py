@@ -67,6 +67,6 @@ for r in out["crossref"] + out["pubmed"]:
                 + f". PMID:{r['pmid']}")
     print(line)
 
-with open(r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results/m2/refs_metadata.json", "w", encoding="utf-8") as f:
+with open(r"results/m2/refs_metadata.json", "w", encoding="utf-8") as f:
     json.dump(out, f, ensure_ascii=False, indent=2)
 print("\n已保存: refs_metadata.json")

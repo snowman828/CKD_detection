@@ -12,7 +12,7 @@ from scipy.cluster.hierarchy import linkage, fcluster
 from scipy.spatial.distance import squareform
 from sklearn.metrics import adjusted_rand_score
 
-BASE = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行"
+BASE = r"09_"
 OUT = os.path.join(BASE, "results/m2")
 cohort = pd.read_parquet(os.path.join(BASE, "results/cohort.parquet"))
 FEATURES = ["age","sex","race","poverty_ratio","education","bmi","sbp","dbp",

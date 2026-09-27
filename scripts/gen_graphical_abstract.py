@@ -30,7 +30,7 @@ try:
     with urllib.request.urlopen(req, timeout=600) as r:
         data = json.loads(r.read())
     b64 = data["data"][0]["b64_json"]
-    out = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results/m2/graphical_abstract_v1.png"
+    out = r"results/m2/graphical_abstract_v1.png"
     with open(out, "wb") as f:
         f.write(base64.b64decode(b64))
     print("SAVED:", out, os.path.getsize(out), "bytes")

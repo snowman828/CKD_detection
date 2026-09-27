@@ -2,7 +2,7 @@
 """M10 Table 2 —— 子研究判决汇总表（从 results JSON 自动生成）"""
 import json, os
 
-OUT = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results/m2"
+OUT = r"results/m2"
 def load(name):
     with open(os.path.join(OUT, name), encoding="utf-8") as f:
         return json.load(f)

@@ -15,7 +15,7 @@ for k, v in libs.items():
     print(f"  {k}: {v}")
 
 # 2. NNS 计算（真源数字）
-BASE = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行"
+BASE = r"09_"
 d = json.load(open(os.path.join(BASE, "results/model_results.json"), encoding="utf-8"))
 xgb = d["XGB"]
 sens, spec = xgb["sens"], xgb["spec"]

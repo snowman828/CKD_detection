@@ -7,8 +7,8 @@ from sklearn.metrics import roc_auc_score
 from sklearn.linear_model import LogisticRegression
 from xgboost import XGBClassifier
 
-OUT = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results"
-DOC = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/论文/投稿材料"
+OUT = r"results"
+DOC = r"论文/投稿材料"
 
 cohort = pd.read_parquet(os.path.join(OUT, "cohort.parquet"))
 test = pd.read_parquet(os.path.join(OUT, "test_set.parquet"))

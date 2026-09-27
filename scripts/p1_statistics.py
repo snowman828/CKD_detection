@@ -11,8 +11,8 @@ from sklearn.metrics import roc_auc_score
 from xgboost import XGBClassifier
 
 t0 = time.time()
-RES = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results"
-DATA = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/data"
+RES = r"results"
+DATA = r"data"
 FEATURES = ["age", "sex", "race", "poverty_ratio", "education", "bmi", "sbp", "dbp", "hba1c", "diabetes", "total_cholesterol", "hdl"]
 RNG = 2026
 NBOOT = 5000

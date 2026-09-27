@@ -15,8 +15,8 @@ from sklearn.metrics import adjusted_rand_score
 from scipy.optimize import minimize
 import socks, socket
 
-OUT = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results/m2"
-cohort = pd.read_parquet(r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/results/cohort.parquet")
+OUT = r"results/m2"
+cohort = pd.read_parquet(r"results/cohort.parquet")
 FEATURES = ["age","sex","race","poverty_ratio","education","bmi","sbp","dbp",
             "hba1c","diabetes","total_cholesterol","hdl"]
 def prep_fit(X):
@@ -182,7 +182,7 @@ print(f"  熵平衡后 ΔAUC={d0:+.3f} CI={ci(d_bs)}", flush=True)
 print("=== S5: Harrell C bootstrap（300 轮）===", flush=True)
 import urllib.request, json as _json
 # 加载 LMF 死亡率
-lmf_dir = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行/data/lmf"
+lmf_dir = r"data/lmf"
 def read_lmf(path):
     widths = [(1,6),(15,15),(16,16),(17,19),(20,20),(21,21),(22,22),(23,26),(43,45),(46,48)]
     cols = ["seqn","eligstat","mortstat","ucod_leading","diabetes","hyperten","dodqtr","dodyear","permth_int","permth_exm"]

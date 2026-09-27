@@ -1,0 +1,17 @@
+{
+ "_note": "Derived count artifact for multiplicity disclosure; recomputed from the frozen analysis output and the pre-specified protocol. No assumptions added.",
+ "source_subgroup_dca_incremental_sha256_16": "6c2f2d4379ca72c0",
+ "source_protocol_sha256_16": "cb590c82a1b75117",
+ "subgroup_comparisons": 10,
+ "subgroup_comparison_definition": "one XGBoost-vs-logistic-regression AUC difference per pre-specified subgroup (age x3, sex x2, race/ethnicity x3, PIR x2)",
+ "overall_benchmark_comparisons": 3,
+ "overall_benchmark_definition": "XGBoost vs logistic regression, vs age-only, vs the three-variable clinical rule",
+ "threshold_grid_points": 21,
+ "threshold_grid_range": [
+  0.05,
+  0.25
+ ],
+ "prespecified_reporting_range": "5–25%",
+ "subgroups_prespecified_as_exploratory_no_multiplicity_adjustment": true,
+ "decision_curve_evaluations": 231
+}
