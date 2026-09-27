@@ -14,3 +14,8 @@ data/
 results/_prev_*/
 .DS_Store
 Thumbs.db
+*.bak*
+*.tmp
+~
+*.orig
+__pycache__/
