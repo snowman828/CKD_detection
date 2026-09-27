@@ -1,0 +1,109 @@
+{
+  "design": "frozen NHANES 2011-2016 XGBoost, race-blind variant (pre-specified)",
+  "self_check_nhanes_2017_2018_auc": 0.8065,
+  "harmonization": {
+    "income": "incm5 quintile -> NHANES dev PIR quintile means",
+    "income_quintile_means": [
+      0.5216,
+      1.1574,
+      1.978,
+      3.4443,
+      4.9616
+    ],
+    "education": "edu 1-4 linearly rescaled to DMDEDUC2 1-5"
+  },
+  "per_wave": {
+    "2022": {
+      "file": "hn22_all.sas7bdat",
+      "n_raw": 6265,
+      "n": 5266,
+      "n_ckd": 461,
+      "ckd_pct": 8.75,
+      "uacr_median_mg_g": 5.448,
+      "auc": 0.7713
+    },
+    "2023": {
+      "file": "hn23_all.sas7bdat",
+      "n_raw": 6929,
+      "n": 5846,
+      "n_ckd": 522,
+      "ckd_pct": 8.93,
+      "uacr_median_mg_g": 5.826,
+      "auc": 0.7807
+    },
+    "2024": {
+      "file": "hn24_all.sas7bdat",
+      "n_raw": 6997,
+      "n": 5933,
+      "n_ckd": 542,
+      "ckd_pct": 9.14,
+      "uacr_median_mg_g": 5.647,
+      "auc": 0.7844
+    }
+  },
+  "pooled": {
+    "n": 17045,
+    "n_ckd": 1525,
+    "ckd_pct": 8.95,
+    "uacr_median_mg_g": 5.652,
+    "auc": {
+      "value": 0.7791,
+      "ci": [
+        0.7662,
+        0.7902
+      ]
+    },
+    "calibration": {
+      "slope": 0.079,
+      "intercept": 0.25,
+      "ece": 0.0732
+    },
+    "at_frozen_threshold_0.16": {
+      "sensitivity": 0.722,
+      "specificity": 0.7001,
+      "ppv": 0.1913,
+      "flagged_per_1000": 337.7,
+      "true_cases_per_1000": 89.5
+    },
+    "dca": {
+      "0.05": {
+        "model_nb": 0.04883667073227216,
+        "treat_all_nb": 0.041546371061123036
+      },
+      "0.10": {
+        "model_nb": 0.028401942570320388,
+        "treat_all_nb": -0.011701052768814571
+      },
+      "0.15": {
+        "model_nb": 0.015329663692992601,
+        "treat_all_nb": -0.07121287940227425
+      },
+      "0.20": {
+        "model_nb": 0.005397477266060428,
+        "treat_all_nb": -0.13816368436491638
+      },
+      "0.25": {
+        "model_nb": -0.0010755842378018937,
+        "treat_all_nb": -0.21404126332257747
+      }
+    }
+  },
+  "recalibration_sensitivity": {
+    "note": "calibration-only simulation; NOT a validation result",
+    "ece_raw": 0.0732,
+    "ece_intercept_only": 0.0059,
+    "intercept_correction_a": -0.8129,
+    "ece_slope_intercept": 0.0025,
+    "slope_intercept_fit": [
+      0.9142,
+      -0.9059
+    ]
+  },
+  "mean_predicted_risk": 0.1626,
+  "nhanes_reference": {
+    "dev_n": 17777,
+    "dev_ckd_pct": 15.96,
+    "val_n": 5801,
+    "val_ckd_pct": 17.53
+  }
+}

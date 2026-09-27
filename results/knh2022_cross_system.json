@@ -1,0 +1,91 @@
+{
+  "design": "frozen NHANES 2011-2016 XGBoost; race-blind variant (pre-specified for cross-system use)",
+  "self_check_nhanes_2017_2018_auc": 0.8099,
+  "nhanes_race_blind_2017_2018_auc": 0.8065,
+  "harmonization": {
+    "income": "KNHANES incm5 (quintile) -> NHANES dev PIR quintile means",
+    "income_quintile_means": [
+      0.5216,
+      1.1574,
+      1.978,
+      3.4443,
+      4.9616
+    ],
+    "education": "KNHANES edu (1-4) linearly rescaled to NHANES DMDEDUC2 scale (1-5)"
+  },
+  "knh_cohort": {
+    "n": 5266,
+    "n_ckd": 461,
+    "ckd_pct": 8.75,
+    "uacr_median_mg_g": 5.448
+  },
+  "auc": {
+    "value": 0.7713,
+    "ci": [
+      0.7482,
+      0.7936
+    ]
+  },
+  "calibration": {
+    "slope": 0.0755,
+    "intercept": 0.242,
+    "ece": 0.0737
+  },
+  "at_frozen_threshold_0.16": {
+    "sensitivity": 0.7007,
+    "specificity": 0.7076,
+    "ppv": 0.1869,
+    "flagged_per_1000": 328.1,
+    "true_cases_per_1000": 87.5
+  },
+  "dca": {
+    "0.05": {
+      "model_nb": 0.047134547344433994,
+      "treat_all_nb": 0.039518659923641224
+    },
+    "0.10": {
+      "model_nb": 0.02667004262142887,
+      "treat_all_nb": -0.013841414525045379
+    },
+    "0.15": {
+      "model_nb": 0.012309823283662119,
+      "treat_all_nb": -0.07347914479122454
+    },
+    "0.20": {
+      "model_nb": 0.0030858336498290895,
+      "treat_all_nb": -0.14057159134067604
+    },
+    "0.25": {
+      "model_nb": -0.0038612482592733297,
+      "treat_all_nb": -0.21660969743005443
+    }
+  },
+  "sensitivity_analyses": [
+    {
+      "label": "income=队列中位数（映射不敏感）",
+      "auc": 0.7715
+    },
+    {
+      "label": "education 原始 1–4（不重标）",
+      "auc": 0.7723
+    }
+  ],
+  "recalibration_sensitivity": {
+    "note": "calibration-only simulation (uses target prevalence); NOT a validation result",
+    "ece_raw": 0.0737,
+    "ece_intercept_only": 0.0101,
+    "intercept_correction_a": -0.8304,
+    "ece_slope_intercept": 0.0041,
+    "slope_intercept_fit": [
+      0.878,
+      -0.964
+    ],
+    "prevalence": {
+      "nhanes_dev_pct": 15.96,
+      "nhanes_val_pct": 17.53,
+      "knhanes_pct": 8.75,
+      "mean_predicted_risk_knhanes": 0.1613
+    },
+    "predicted_vs_observed_note": "model over-predicts in KNHANES as expected from lower target prevalence"
+  }
+}
