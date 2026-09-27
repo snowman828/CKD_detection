@@ -26,21 +26,64 @@ in submission; the citation will be completed on publication (see `CITATION.cff`
 
 ## Pipeline
 ```bash
-python scripts/download_nhanes.py    # NHANES download (4 cycles + mortality linkage)
-python scripts/build_cohort.py       # cohort construction, CKD-EPI 2021 eGFR, KDIGO labels, anti-leakage feature set
-python scripts/modeling.py           # logistic regression / XGBoost / MLP + external temporal validation
-python scripts/export_models.py      # persist the trained models + preprocessing (verified against model_results.json)
-python scripts/component_and_subgroup_analysis.py   # component AUCs + subgroup calibration (addendum analyses)
-python scripts/m9_table1.py          # Table 1 (cohort characteristics)
-python scripts/m10_table2.py         # Table 2 (model performance)
-python scripts/m2_substudy12.py      # sub-studies S1–S2
-python scripts/m3_substudy3.py       # sub-study S3 (spectrum attribution)
-python scripts/m5_substudy4.py       # sub-study S4 (poverty-income gradient, entropy balancing)
-python scripts/m4_substudy5b.py      # sub-study S5-B (mortality, exploratory)
-python scripts/m6_figure1.py        # Figure 1
-python scripts/m7_figure2.py        # Figure 2
-python scripts/m8_figure3.py        # Figure 3
+# step 0 — recon & NNS (run before anything else; checks library availability + sample size)
+python scripts/check_nns.py
+
+# step 1 — data (clinical files only; LMF mortality is fetched separately by cox_s5b.py / m4_substudy5b.py)
+python scripts/download_nhanes.py    # 4 NHANES clinical cycles: 2011-12(G) / 2015-16(I) / 2017-18(J) / 2019-20(K)
+
+# step 2 — cohort (G/H/I/J = 2011/2013/2015/2017; CKD-EPI 2021 eGFR, KDIGO labels, leakage-free features)
+#              note: H (2013-14) files not in download_nhanes.py CYCLE_FILES; H expected pre-loaded or separately available
+python scripts/build_cohort.py
+
+# step 3 — modeling (LR / XGBoost / MLP; train = G+H+I i.e. 2011+2013+2015; external temporal test = J only, i.e. 2017)
+python scripts/modeling.py
+
+# step 4 — persist trained models + preprocessing (verified against model_results.json, |ΔAUC| ≤ 1e-4)
+python scripts/export_models.py
+
+# step 5 — addendum analyses (component AUCs + subgroup calibration → SI Table S4)
+python scripts/component_and_subgroup_analysis.py
+
+# step 6 — tables (Table 1 = cohort characteristics; Table 2 = sub-study verdict summary, generated from results JSON)
+python scripts/m9_table1.py
+python scripts/m10_table2.py
+
+# step 7 — sub-studies S1–S5-B
+python scripts/m2_substudy12.py     # S1–S2 (SHAP×CKM footprint probe + NADKD stratified detection)
+python scripts/m3_substudy3.py       # S3 (young-adult attenuation: spectrum vs signal accumulation vs interaction)
+python scripts/m5_substudy4.py       # S4 (PIR gradient attribution, entropy balancing)
+python scripts/m4_substudy5b.py      # S5-B (systemic footprint: NHANES LMF all-cause / CVD death; reads data/lmf/)
+python scripts/cox_s5b.py            # S5-B Cox survival analysis (lifelines; all-cause + CVD death C-index vs age-only)
+
+# step 8 — sub-study figures (internal working figures; NOT the CJASN main-text figures)
+python scripts/m6_figure1.py         # → figure1_substudy1.png (SHAP footprint, CKM pathway coloring)
+python scripts/m7_figure2.py        # → figure2_forest.png/.pdf (stratified AUC forest: uACR/DM strata, age, PIR)
+python scripts/m8_figure3.py        # → figure3_spectrum.png/.pdf (case-severity spectrum stacked bar)
+
+# step 9 — CJASN main-text Figure 1–5 (Figure1 participant flow → Figure2 ROC curves →
+#         Figure3 calibration → Figure4 decision-curve → Figure5 subgroup AUC forest;
+#         Fig1/Fig5 read repo-local results/*.json; Fig2–4 need the .npy/.parquet test artifacts)
+python scripts/make_cjasn_figures.py
+
+# step 10 — Supplementary Information (S1–S3 + methods; all real data; outputs SupplementaryInformation.md → docx)
+python scripts/gen_supplementary.py
+
+# step 11 — reference verification (CrossRef bibliographic match per citation; outputs verification report)
+python scripts/verify_refs.py
 ```
+
+> **Cycle-count note** (verified against each script body, not the docstrings):
+> - `download_nhanes.py` `CYCLE_FILES` lists **4** clinical cycles: 2011(G) / 2015(I) / 2017(J) / 2019(K) —
+>   it does **not** list 2013(H).
+> - `build_cohort.py` `CYCLES = {G:2011, H:2013, I:2015, J:2017}` — **4** cycles including H (2013-14).
+> - `modeling.py` trains on `year.isin([2011, 2013, 2015])` = **G+H+I** and tests on `year==2017` = **J only**.
+> - **Known gap**: cycle H (2013-14) files are consumed by `build_cohort.py`/`modeling.py` but are **absent
+>   from `download_nhanes.py` `CYCLE_FILES`**; they must be pre-loaded (or fetched separately) before the
+>   cohort/modeling steps. Cycle K (2019-2020) is downloaded but back-filled into the P_ series after
+>   NHANES re-release and is **not** in the main G/H/I/J train set (keeps 2019 out of the test split).
+> - Mortality data (LMF, follow-up to 2019-12-31) is a separate file family under `data/lmf/`,
+>   read directly by `cox_s5b.py` and `m4_substudy5b.py` — **not** by `download_nhanes.py`.
 
 ## 脚本地图（script map）
 
