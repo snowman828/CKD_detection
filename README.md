@@ -96,8 +96,13 @@ python scripts/verify_refs.py
 `m4_substudy5b` · `m5_substudy4` · `m6_figure1` · `m7_figure2` · `m8_figure3` · `cox_s5b` ·
 `component_and_subgroup_analysis` · `early_late_composition` · `gen_supplementary` ·
 `p1_clinical_equity` · `p1_ml` · `p1_statistics` · `p2_independent_era` · `p3_knh_validation` ·
+`knh2022_cross_system`（阶段 C：KNHANES 2022 冻结模型 + race-blind 口径外部验证）·
+`knh_multiwave_cross_system`（三波 2022/2023/2024 跨体系验证 + 波次一致性）·
 `race_blind_sensitivity` · `s4_boot1000` · `sensitivity_seed_race` · `subgroup_dca_incremental` ·
 `supplementary_analysis` · `m15_blind_ageonly` · `verify_refs`
+
+> 计数：A（可重跑）33 + B（一次性）6 + C（工具/制图）2 = **41**，与 `scripts/` 实际 `.py` 数一致
+> （另 1 个 npjDM 他稿件脚本在 `extras_npjdm/`，不计入）。
 
 **B. 一次性 / 历史修补件（No · 勿重跑，留作复现审计）**：
 | 脚本 | 用途 | 为何勿重跑 |
