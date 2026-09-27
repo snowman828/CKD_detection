@@ -4,7 +4,7 @@
 沿用 knh2022_cross_system.py 的冻结流程与预指定 race-blind 口径，仅把 KNHANES 侧扩为三波。
 """
 import os, sys, json, zipfile, glob, numpy as np, pandas as pd, pyreadstat
-sys.path.insert(0, r"repo_public_push_ready\scripts")
+sys.path.insert(0, r"scripts")
 import knh2022_cross_system as M
 from xgboost import XGBClassifier
 from sklearn.metrics import roc_auc_score

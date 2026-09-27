@@ -4,11 +4,13 @@ title: "CKD-detection: detection of chronic kidney disease from routine non-kidn
 authors:
   - family-names: Zhao
     given-names: Yixin
-    # ORCID: <to be added by the author>
+    orcid: "https://orcid.org/0009-0002-2452-4813"
   - family-names: Zhang
     given-names: Zhiyong
+    orcid: "https://orcid.org/0009-0006-2668-3761"
   - family-names: Wang
     given-names: Dawei
+    orcid: "https://orcid.org/0000-0001-9323-0144"
     email: nit05wangdawei@163.com
 license: MIT
 type: software

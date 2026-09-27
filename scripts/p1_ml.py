@@ -14,7 +14,7 @@ from xgboost import XGBClassifier, DMatrix
 
 t0 = time.time(); RNG = 2026
 RES = r"results"
-REPO = r"repo_public_push_ready"
+REPO = r"."
 FEATURES = ["age", "sex", "race", "poverty_ratio", "education", "bmi", "sbp", "dbp", "hba1c", "diabetes", "total_cholesterol", "hdl"]
 cohort = pd.read_parquet(os.path.join(RES, "cohort.parquet"))
 train = cohort[cohort["year"].isin([2011, 2013, 2015])].copy()

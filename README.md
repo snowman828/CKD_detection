@@ -42,6 +42,53 @@ python scripts/m7_figure2.py        # Figure 2
 python scripts/m8_figure3.py        # Figure 3
 ```
 
+## 全量脚本清单（自动生成，与包内 `scripts/` 一一对应）
+
+| # | 脚本 | 用途 |
+|---|---|---|
+| 1 | `scripts/build_cohort.py` | 构建分析队列（CKD-EPI 2021 eGFR、KDIGO 标签、防泄漏特征集） |
+| 2 | `scripts/check_nns.py` | 样本量/NNS 检查 |
+| 3 | `scripts/component_and_subgroup_analysis.py` | 组分 AUC + 亚组校准（补充分析） |
+| 4 | `scripts/cox_s5b.py` | S5-B 生存分析（Cox） |
+| 5 | `scripts/download_nhanes.py` | 下载 NHANES 4 个周期 + 死亡联动文件 |
+| 6 | `scripts/early_late_composition.py` | 早期/晚期构成比分析 |
+| 7 | `scripts/export_models.py` | 导出训练模型与预处理参数（与 model_results.json 逐项核验） |
+| 8 | `scripts/fix_refs_final.py` | 参考文献格式定稿 |
+| 9 | `scripts/fix_vancouver_final.py` | Vancouver 格式收尾 |
+| 10 | `scripts/gen_supplementary.py` | 补充材料生成 |
+| 11 | `scripts/knh2022_cross_system.py` | KNHANES 2022 跨系统复核 |
+| 12 | `scripts/knh_multiwave_cross_system.py` | KNHANES 多波次跨系统复核 |
+| 13 | `scripts/m10_table2.py` | 表 2（模型性能） |
+| 14 | `scripts/m11_robustness.py` | 稳健性分析 |
+| 15 | `scripts/m12_refs.py` | 参考文献元数据获取 |
+| 16 | `scripts/m13_clean4submission.py` | 投稿前清理 |
+| 17 | `scripts/m14_review_fixes.py` | 审稿意见相关修订分析 |
+| 18 | `scripts/m15_blind_ageonly.py` | 年龄单变量盲法对照 |
+| 19 | `scripts/m2_substudy12.py` | 子研究 S1–S2 |
+| 20 | `scripts/m3_substudy3.py` | 子研究 S3（谱系归因） |
+| 21 | `scripts/m4_substudy5b.py` | 子研究 S5-B（死亡，探索性） |
+| 22 | `scripts/m5_substudy4.py` | 子研究 S4（收入梯度、熵平衡） |
+| 23 | `scripts/m6_figure1.py` | 图 1 |
+| 24 | `scripts/m7_figure2.py` | 图 2 |
+| 25 | `scripts/m8_figure3.py` | 图 3 |
+| 26 | `scripts/m9_table1.py` | 表 1（队列特征） |
+| 27 | `scripts/make_cjasn_figures.py` | 分析/工具脚本（见脚本头注释） |
+| 28 | `scripts/md2docx_minimal.py` | md→docx 最小转换器（含页码/双倍行距） |
+| 29 | `scripts/modeling.py` | 逻辑回归 / XGBoost / MLP + 外部时间验证（主分析） |
+| 30 | `scripts/p1_clinical_equity.py` | P1 临床公平性 |
+| 31 | `scripts/p1_ml.py` | P1 机器学习扩展 |
+| 32 | `scripts/p1_statistics.py` | P1 统计 |
+| 33 | `scripts/p2_independent_era.py` | 独立时代外部验证（NHANES 2007–2010；SI Table S14） |
+| 34 | `scripts/p3_knh_validation.py` | 跨系统外部验证（KNHANES；含内部一致性门与单位门） |
+| 35 | `scripts/race_blind_sensitivity.py` | 去种族变量敏感性分析 |
+| 36 | `scripts/s4_boot1000.py` | 1000 次 bootstrap（第四子研究） |
+| 37 | `scripts/sensitivity_seed_race.py` | 随机种子/种族敏感性 |
+| 38 | `scripts/subgroup_dca_incremental.py` | 亚组决策曲线与增量分析 |
+| 39 | `scripts/supplementary_analysis.py` | 补充分析 |
+| 40 | `scripts/vancouver_renumber.py` | 参考文献重编号 |
+| 41 | `scripts/verify_refs.py` | 参考文献核验 |
+
+
 ## Environment
 ```bash
 python -m venv .venv && source .venv/Scripts/activate   # Windows: .venv\Scripts\activate
