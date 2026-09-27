@@ -8,7 +8,7 @@
 - 单位自检门：uACR 中位数若落在 2–20 mg/g 之外，视为单位/量纲问题 → **中止并报错**，不产出可疑数字
 - 输出：results/p3_knh_validation.json
 用法
-  python scripts/p3_knh_validation.py --knh "G:/.../data/knh" [--dry-run]
+  python scripts/p3_knh_validation.py --knh "" [--dry-run]
 """
 import argparse, glob, io, json, os, re, sys, zipfile, tempfile
 import numpy as np, pandas as pd
