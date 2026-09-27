@@ -9,7 +9,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from xgboost import XGBClassifier
 
-RES = os.environ.get("MACKI_RESULTS_DIR", r"results")
+RES = os.environ.get("CKD-detection_RESULTS_DIR", r"results")
 FEATURES = ["age", "sex", "race", "poverty_ratio", "education", "bmi", "sbp", "dbp", "hba1c", "diabetes", "total_cholesterol", "hdl"]
 t0 = time.time()
 cohort = pd.read_parquet(os.path.join(RES, "cohort.parquet"))

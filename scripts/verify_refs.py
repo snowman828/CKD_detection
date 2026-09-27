@@ -22,7 +22,7 @@ REFS = [
 def crossref_query(q, rows=3):
     url = "https://api.crossref.org/works?" + urllib.parse.urlencode(
         {"query.bibliographic": q, "rows": rows, "select": "title,author,container-title,issued,DOI,volume,page,type"})
-    req = urllib.request.Request(url, headers={"User-Agent": "MACKI-RefVerifier/1.0 (mailto:research@example.org)"})
+    req = urllib.request.Request(url, headers={"User-Agent": "CKD-detection-RefVerifier/1.0 (mailto:research@example.org)"})
     with urllib.request.urlopen(req, timeout=30) as r:
         return json.load(r)["message"]["items"]
 

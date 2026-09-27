@@ -1,4 +1,4 @@
-# MACKI-Dry — reproducible analysis pipeline
+# CKD-detection — reproducible analysis pipeline
 
 **Detection of chronic kidney disease from routine, non-kidney-specific clinical data (NHANES 2011–2018):
 development and external temporal validation of machine-learning models.**

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """m13 —— 投稿版清理：剥离草稿注记 + Table 1 从 CSV 程序化生成（红线：禁止手工抄写）
-输出：MACKI_Followup_Mechanistic_CLEAN.md → 供 md2docx 转换
+输出：CKD-detection_Followup_Mechanistic_CLEAN.md → 供 md2docx 转换
 """
 import pandas as pd, re, os
 
 BASE = r""
-MD = os.path.join(BASE, "论文/MACKI_Followup_Mechanistic_DRAFT_v1.md")
-OUT_MD = os.path.join(BASE, "论文/MACKI_Followup_Mechanistic_CLEAN.md")
+MD = os.path.join(BASE, "论文/CKD-detection_Followup_Mechanistic_DRAFT_v1.md")
+OUT_MD = os.path.join(BASE, "论文/CKD-detection_Followup_Mechanistic_CLEAN.md")
 CSV = os.path.join(BASE, "results/m2/table1_baseline.csv")
 
 # ---- Table 1 从 CSV 程序化生成 ----

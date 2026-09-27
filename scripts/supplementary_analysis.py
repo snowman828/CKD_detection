@@ -1,4 +1,4 @@
-"""MACKI-Dry 补强分析 v2（审稿修复版）
+"""CKD-detection 补强分析 v2（审稿修复版）
 新增（回应红队 P0-1/P0-3）：
   S1 年龄-only 基线：仅 age 特征的 XGB → 量化"总体 AUC 有多少来自年龄组间分层"
   S2 临床规则基线：LR 仅用 age+diabetes+sbp → 与"复杂 ML"公平对比

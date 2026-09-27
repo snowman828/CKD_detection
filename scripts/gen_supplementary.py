@@ -56,7 +56,7 @@ miss_df = pd.DataFrame(miss_rows, columns=["Feature", "Development missing %", "
 # --- 组装补充材料 md ---
 sup_md = f"""# Supplementary Information
 
-**Accompanying**: *Detection of chronic kidney disease from routine clinical data without kidney-specific testing: development and external temporal validation of machine-learning models in NHANES 2011–2018* (MACKI-Dry, v2.0)
+**Accompanying**: *Detection of chronic kidney disease from routine clinical data without kidney-specific testing: development and external temporal validation of machine-learning models in NHANES 2011–2018* (CKD-detection, v2.0)
 
 All results in this supplement are computed from the open analysis pipeline (NHANES 2011–2018, four cycles; external temporal validation on the completely unseen 2017–2018 cycle, n=5,801).
 

@@ -1,4 +1,4 @@
-# Pre-specified analysis plan (protocol) — MACKI-Dry (detection analysis)
+# Pre-specified analysis plan (protocol) — CKD-detection (detection analysis)
 
 > **Status.** This is the analysis plan as finalised **before** the analyses were run. **The study was not registered**; no registration identifier exists for it. The plan is deposited here and in the analysis-code repository so that the pre-specification is verifiable.
 
@@ -33,4 +33,4 @@
 
 ## Known Deviations
 
-The companion mechanistic manuscript (MACKI-Followup) was conceived after the initial analysis and is reported separately, with its own pre-defined analysis plan; its five substudies (S1 footprint, S2 blind zone, S3 spectrum attribution, S4 PIR attribution, S5-B mortality) are hypothesis-driven and exploratory.
+The companion mechanistic manuscript (CKD-detection-Followup) was conceived after the initial analysis and is reported separately, with its own pre-defined analysis plan; its five substudies (S1 footprint, S2 blind zone, S3 spectrum attribution, S4 PIR attribution, S5-B mortality) are hypothesis-driven and exploratory.

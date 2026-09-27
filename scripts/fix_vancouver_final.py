@@ -6,8 +6,8 @@
 """
 import re
 
-EN = r"论文/MACKI_Dry_Manuscript_EN_v2.0.md"
-FIN = r"论文/MACKI_Dry_Manuscript_FINAL_投稿完整版.md"
+EN = r"论文/CKD-detection_Dry_Manuscript_EN_v2.0.md"
+FIN = r"论文/CKD-detection_Dry_Manuscript_FINAL_投稿完整版.md"
 
 DIG = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'}
 def sup(n): return ''.join(DIG[c] for c in str(n))

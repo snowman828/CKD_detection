@@ -1,4 +1,4 @@
-# Trained model artifacts (MACKI-Dry CKD detection)
+# Trained model artifacts (CKD-detection CKD detection)
 
 These artifacts are the **exact models** whose external-validation performance is reported in the
 manuscript (XGBoost AUC 0.8099; logistic regression 0.7943; multilayer perceptron 0.7695 on

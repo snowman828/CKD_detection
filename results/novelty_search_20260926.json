@@ -1,7 +1,7 @@
 {
   "date": "2026-09-26",
   "database": "OpenAlex API (https://api.openalex.org)",
-  "proxy": "socks5h://127.0.0.1:10808",
+  "proxy": "author-side local SOCKS5 proxy (address redacted)",
   "queries": [
     {
       "label": "routine clinical data AND chronic kidney disease AND detection",

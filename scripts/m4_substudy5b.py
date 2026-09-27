@@ -1,7 +1,7 @@
 """M4 子研究 H5-B —— 系统性足迹（NHANES LMF 全因/CVD 死亡）
 预注册判定（06 v1.1 §7.5）：全因死亡 C-index ≥ 0.70 且 CVD 死亡 C-index ≥ 0.70 → 系统性足迹支持
 两者 < 0.60 → 肾特异共现（足迹非系统性）
-方法：XGBoost（同 MACKI 参数）基线常规特征 → 死亡风险分数 → Harrell C（含删失，向量化）
+方法：XGBoost（同 CKD-detection 参数）基线常规特征 → 死亡风险分数 → Harrell C（含删失，向量化）
 数据：NHANES 2011-2018 cohort（SEQN 匹配 LMF 2019 public-use，随访至 2019-12-31）
 """
 import pandas as pd, numpy as np, json, os

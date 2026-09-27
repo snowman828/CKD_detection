@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""MACKI-Dry 模型产物导出（满足 CJASN "trained machine learning models" 条款）
+"""CKD-detection 模型产物导出（满足 CJASN "trained machine learning models" 条款）
 
 设计原则
 - 完全复现 `modeling.py` 的预处理与超参数（train = 2011/2013/2015；test = 2017）
@@ -18,7 +18,7 @@ from xgboost import XGBClassifier
 from sklearn.metrics import roc_auc_score
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))       # repo 根
-RES = os.environ.get("MACKI_RESULTS_DIR", r"results")
+RES = os.environ.get("CKD-detection_RESULTS_DIR", r"results")
 OUT = os.path.join(BASE, "models")
 os.makedirs(OUT, exist_ok=True)
 
@@ -130,7 +130,7 @@ meta = {
 }
 json.dump(meta, open(os.path.join(OUT, "model_metadata.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 
-readme = f"""# Trained model artifacts (MACKI-Dry CKD detection)
+readme = f"""# Trained model artifacts (CKD-detection CKD detection)
 
 These artifacts are the **exact models** whose external-validation performance is reported in the
 manuscript (XGBoost AUC 0.8099; logistic regression 0.7943; multilayer perceptron 0.7695 on

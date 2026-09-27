@@ -3,7 +3,7 @@
   7=KDIGO 8=Shi 9=Chu 10=Sabanayagam 11=ZhangK 12=KIDS 13=DeepDKD 14=Holmstrom 15=TRIPOD 16=CDC
 当前（被 m² 误伤偏移）：Jager=2 GBD=3 WHA=1 ZhangL=4 Kovesdy=5 6-14 正确 TRIPOD=15 CDC=17
 """
-SRC = r"论文/MACKI_Dry_Manuscript_FINAL_投稿完整版.md"
+SRC = r"论文/CKD-detection_Dry_Manuscript_FINAL_投稿完整版.md"
 md = open(SRC, encoding='utf-8').read()
 head, refs_part = md.split('## References')
 

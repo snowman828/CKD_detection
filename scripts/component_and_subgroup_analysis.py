@@ -12,7 +12,7 @@ from sklearn.metrics import roc_auc_score
 from xgboost import XGBClassifier
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RES = os.environ.get("MACKI_RESULTS_DIR", r"results")
+RES = os.environ.get("CKD-detection_RESULTS_DIR", r"results")
 
 FEATURES = ["age", "sex", "race", "poverty_ratio", "education", "bmi",
             "sbp", "dbp", "hba1c", "diabetes", "total_cholesterol", "hdl"]
