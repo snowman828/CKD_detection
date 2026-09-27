@@ -20,11 +20,14 @@ from sklearn.metrics import roc_auc_score, roc_curve
 from sklearn.linear_model import LogisticRegression
 from xgboost import XGBClassifier
 
-P   = r""
-E   = os.path.join(P, "09_")
-RES = os.path.join(E, "results")
+# 仓内相对路径（GitHub 检出即可运行 Fig1–4；Fig5 需外部稿件，见下）
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+RES = os.path.join(ROOT, "results")
 OUT = os.path.join(RES, "figures_cjasn_v2")
-MAN = os.path.join(E, "", "01_CJASN_Detection", "CJASN_Manuscript.md")
+MAN = os.environ.get("CKD_MANUSCRIPT_MD", os.path.join(ROOT, "CJASN_Manuscript.md"))
+# 数据依赖（DATA_AVAILABILITY.md 说明）：results/test_proba_{xgb,lr,mlp}.npy、
+# test_y.npy、test_set.parquet、cohort.parquet 为 gitignore 的中间产物，
+# 由 scripts/download_nhanes.py + build_cohort.py + modeling.py 重建。
 os.makedirs(OUT, exist_ok=True)
 
 # ---------------- 版式唯一真源 ----------------
@@ -146,21 +149,38 @@ def figure4(y, px, pl, pr):
     return _save(fig, "Figure4")
 
 # ============================== Figure 5 ==============================
+def _fam(lab):
+    return ("age" if lab.startswith("Age") else "sex" if lab in ("Male", "Female")
+            else "race" if lab in ("White", "Black", "Hispanic") else "pov")
+
+ALIAS = {"Age 18–44 y": "Age 18–44 y", "Age 45–64 y": "Age 45–64 y", "Age ≥65 y": "Age ≥65 y",
+         "Male": "Male", "Female": "Female", "White": "White", "Black": "Black",
+         "Hispanic": "Hispanic / Mexican American", "Poverty-income ratio <1.3": "PIR < 1.3",
+         "Poverty-income ratio ≥1.3": "PIR ≥ 1.3"}
+
 def figure5():
-    md = open(MAN, encoding="utf-8").read()
-    rows = re.findall(r"^\| ([^|]+?) \| ([\d,]+) \| ([\d.]+) \(([\d.]+)–([\d.]+)\) \| ([\d.]+) \|$", md, re.M)
-    assert len(rows) == 10, f"Table 3 解析行数异常: {len(rows)}"
-    alias = {"Age 18–44 y": "Age 18–44 y", "Age 45–64 y": "Age 45–64 y", "Age ≥65 y": "Age ≥65 y",
-             "Male": "Male", "Female": "Female", "White": "White", "Black": "Black",
-             "Hispanic": "Hispanic / Mexican American", "Poverty-income ratio <1.3": "PIR < 1.3",
-             "Poverty-income ratio ≥1.3": "PIR ≥ 1.3"}
-    data = []
-    for lab, n, auc, lo, hi, lrauc in rows:
-        lab = lab.strip(); fam = ("age" if lab.startswith("Age") else "sex" if lab in ("Male", "Female")
-                                  else "race" if lab in ("White", "Black", "Hispanic") else "pov")
-        data.append(dict(lab=alias.get(lab, lab), n=int(n.replace(",", "")), auc=float(auc),
-                         lo=float(lo), hi=float(hi), lr=float(lrauc), fam=fam))
-    overall = 0.810
+    # 数据源（首选）：仓内 results/ JSON，round(…,3) 后与稿件 Table 3 数值一致
+    # （2026-09-28 逐值核对：n/auc/lo/hi/lr 十行全同）。稿件 md（MAN）为兜底路径。
+    ci_p, dca_p = os.path.join(RES, "supplementary_results.json"), os.path.join(RES, "subgroup_dca_incremental.json")
+    if os.path.exists(ci_p) and os.path.exists(dca_p):
+        ci = json.load(open(ci_p, encoding="utf-8"))["subgroup_auc_ci_xgb"]
+        sg = json.load(open(dca_p, encoding="utf-8"))["subgroups"]
+        assert len(sg) == 10, f"子组数异常: {len(sg)}"
+        r3 = lambda v: round(float(v), 3)
+        data = [dict(lab=ALIAS.get(sg[k]["label"], sg[k]["label"]), n=int(sg[k]["n"]),
+                     auc=r3(ci[k]["auc"]), lo=r3(ci[k]["ci95"][0]), hi=r3(ci[k]["ci95"][1]),
+                     lr=r3(sg[k]["auc_lr"]), fam=_fam(sg[k]["label"])) for k in sg]
+        overall = r3(json.load(open(dca_p, encoding="utf-8"))["overall"]["auc_xgb"])
+    else:
+        md = open(MAN, encoding="utf-8").read()
+        rows = re.findall(r"^\| ([^|]+?) \| ([\d,]+) \| ([\d.]+) \(([\d.]+)–([\d.]+)\) \| ([\d.]+) \|$", md, re.M)
+        assert len(rows) == 10, f"Table 3 解析行数异常: {len(rows)}"
+        data = []
+        for lab, n, auc, lo, hi, lrauc in rows:
+            lab = lab.strip()
+            data.append(dict(lab=ALIAS.get(lab, lab), n=int(n.replace(",", "")), auc=float(auc),
+                             lo=float(lo), hi=float(hi), lr=float(lrauc), fam=_fam(lab)))
+        overall = 0.810
     fig, ax = plt.subplots(figsize=(6.76, 4.87))
     ys = np.arange(len(data))[::-1]
     for yy, d in zip(ys, data):

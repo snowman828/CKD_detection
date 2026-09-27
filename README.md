@@ -42,51 +42,44 @@ python scripts/m7_figure2.py        # Figure 2
 python scripts/m8_figure3.py        # Figure 3
 ```
 
-## 全量脚本清单（自动生成，与包内 `scripts/` 一一对应）
+## 脚本地图（script map）
 
-| # | 脚本 | 用途 |
+`scripts/` 共 **41** 个脚本（另 1 个 npjDM 他稿件脚本在 `extras_npjdm/`，不属于本仓主线）。
+按「能否安全重跑」分三类——**一次性/历史修补件（No）请勿重跑**（它们针对某次中间态的稿件，
+重跑会对已定稿稿件做破坏性替换或无意义操作；保留只为复现审计链）：
+
+**A. 核心分析管线（可重跑）**：`download_nhanes` · `build_cohort` · `modeling` · `export_models` ·
+`check_nns` · `m9_table1` · `m10_table2` · `m11_robustness` · `m2_substudy12` · `m3_substudy3` ·
+`m4_substudy5b` · `m5_substudy4` · `m6_figure1` · `m7_figure2` · `m8_figure3` · `cox_s5b` ·
+`component_and_subgroup_analysis` · `early_late_composition` · `gen_supplementary` ·
+`p1_clinical_equity` · `p1_ml` · `p1_statistics` · `p2_independent_era` · `p3_knh_validation` ·
+`race_blind_sensitivity` · `s4_boot1000` · `sensitivity_seed_race` · `subgroup_dca_incremental` ·
+`supplementary_analysis` · `m15_blind_ageonly` · `verify_refs`
+
+**B. 一次性 / 历史修补件（No · 勿重跑，留作复现审计）**：
+| 脚本 | 用途 | 为何勿重跑 |
 |---|---|---|
-| 1 | `scripts/build_cohort.py` | 构建分析队列（CKD-EPI 2021 eGFR、KDIGO 标签、防泄漏特征集） |
-| 2 | `scripts/check_nns.py` | 样本量/NNS 检查 |
-| 3 | `scripts/component_and_subgroup_analysis.py` | 组分 AUC + 亚组校准（补充分析） |
-| 4 | `scripts/cox_s5b.py` | S5-B 生存分析（Cox） |
-| 5 | `scripts/download_nhanes.py` | 下载 NHANES 4 个周期 + 死亡联动文件 |
-| 6 | `scripts/early_late_composition.py` | 早期/晚期构成比分析 |
-| 7 | `scripts/export_models.py` | 导出训练模型与预处理参数（与 model_results.json 逐项核验） |
-| 8 | `scripts/fix_refs_final.py` | 参考文献格式定稿 |
-| 9 | `scripts/fix_vancouver_final.py` | Vancouver 格式收尾 |
-| 10 | `scripts/gen_supplementary.py` | 补充材料生成 |
-| 11 | `scripts/knh2022_cross_system.py` | KNHANES 2022 跨系统复核 |
-| 12 | `scripts/knh_multiwave_cross_system.py` | KNHANES 多波次跨系统复核 |
-| 13 | `scripts/m10_table2.py` | 表 2（模型性能） |
-| 14 | `scripts/m11_robustness.py` | 稳健性分析 |
-| 15 | `scripts/m12_refs.py` | 参考文献元数据获取 |
-| 16 | `scripts/m13_clean4submission.py` | 投稿前清理 |
-| 17 | `scripts/m14_review_fixes.py` | 审稿意见相关修订分析 |
-| 18 | `scripts/m15_blind_ageonly.py` | 年龄单变量盲法对照 |
-| 19 | `scripts/m2_substudy12.py` | 子研究 S1–S2 |
-| 20 | `scripts/m3_substudy3.py` | 子研究 S3（谱系归因） |
-| 21 | `scripts/m4_substudy5b.py` | 子研究 S5-B（死亡，探索性） |
-| 22 | `scripts/m5_substudy4.py` | 子研究 S4（收入梯度、熵平衡） |
-| 23 | `scripts/m6_figure1.py` | 图 1 |
-| 24 | `scripts/m7_figure2.py` | 图 2 |
-| 25 | `scripts/m8_figure3.py` | 图 3 |
-| 26 | `scripts/m9_table1.py` | 表 1（队列特征） |
-| 27 | `scripts/make_cjasn_figures.py` | 分析/工具脚本（见脚本头注释） |
-| 28 | `scripts/md2docx_minimal.py` | md→docx 最小转换器（含页码/双倍行距） |
-| 29 | `scripts/modeling.py` | 逻辑回归 / XGBoost / MLP + 外部时间验证（主分析） |
-| 30 | `scripts/p1_clinical_equity.py` | P1 临床公平性 |
-| 31 | `scripts/p1_ml.py` | P1 机器学习扩展 |
-| 32 | `scripts/p1_statistics.py` | P1 统计 |
-| 33 | `scripts/p2_independent_era.py` | 独立时代外部验证（NHANES 2007–2010；SI Table S14） |
-| 34 | `scripts/p3_knh_validation.py` | 跨系统外部验证（KNHANES；含内部一致性门与单位门） |
-| 35 | `scripts/race_blind_sensitivity.py` | 去种族变量敏感性分析 |
-| 36 | `scripts/s4_boot1000.py` | 1000 次 bootstrap（第四子研究） |
-| 37 | `scripts/sensitivity_seed_race.py` | 随机种子/种族敏感性 |
-| 38 | `scripts/subgroup_dca_incremental.py` | 亚组决策曲线与增量分析 |
-| 39 | `scripts/supplementary_analysis.py` | 补充分析 |
-| 40 | `scripts/vancouver_renumber.py` | 参考文献重编号 |
-| 41 | `scripts/verify_refs.py` | 参考文献核验 |
+| `fix_refs_final.py` | 引用编号最终修复（2026-08-28 v2，修 m² 误伤偏移） | 针对某次乱序中间态硬替换 |
+| `fix_vancouver_final.py` | Vancouver 重编号最终版（v3，从干净源重建 FINAL） | 一次性重建定稿 |
+| `vancouver_renumber.py` | 正文角标按首现顺序重排 | 一次性重排，重跑无意义 |
+| `m12_refs.py` | CrossRef/PubMed 文献元数据补全 | 一次性抓取（硬编码 6 条 DOI/PMID） |
+| `m13_clean4submission.py` | 草稿→干净投稿版 + Table 1 程序化生成 | 一次性转换（红线条款：禁手工抄写） |
+| `m14_review_fixes.py` | 审稿修复补算（对照基准 age-only / Harrell C / 置换 / 符号统一） | 历史补算，结果已入稿 |
+
+**C. 工具 / 制图（可重跑）**：`make_cjasn_figures`（CJASN 主图 1–5 出版级，Fig5 数据源=仓内
+`results/*.json`，Fig1–4 需 gitignore 的 `.npy/.parquet` 中间产物，由 A 类脚本重建）·
+`md2docx_minimal`（零依赖 md→docx）
+
+**其他稿件**：`extras_npjdm/regen_npj_figs_figures_presentation.py` 属于 **npjDM Followup 稿**（非
+CJASN 包内件），单独存放以免与本仓主线混淆。
+
+### CJASN 代码可得性快照（code-availability snapshot）
+CJASN 投稿随附的代码/模型包（`CJASN_SupplementalMaterial_code_and_plan.zip`，75 文件）对应本仓
+**commit `bd0bd6c` 的 `scripts/` + `results/` + `models/` 内容**（`CKD-detection-pipeline` 快照，
+75/75 文件逐一字节级一致）。本仓为持续更新的**权威代码地址**
+（`https://github.com/snowman828/CKD_detection`）；两者差异仅为「快照 vs 现状」，数值与逻辑一致。
+`bd0bd6c` 之后的提交为：脚本地图整理（README）、`make_cjasn_figures.py` 仓内相对路径修复 +
+Fig5 数据源改读仓内 JSON、npjDM 脚本移入 `extras_npjdm/`——均不改任何分析数值。
 
 
 ## Environment
@@ -98,13 +91,14 @@ python -m pip install -r requirements.txt
 
 ## Repository layout
 ```
-scripts/          analysis pipeline (33 Python files)
+scripts/          analysis pipeline (41 Python files; see "脚本地图" above for which are re-runnable vs one-shot)
+extras_npjdm/     companion-manuscript (npjDM Followup) figure script, kept out of the main pipeline
 models/           trained model artifacts (XGBoost JSON, LR/MLP joblib) + preprocessing/medians + metadata + README
 results/          machine-readable result summaries (JSON); parquet data files are git-ignored
 analysis_plan/    pre-specified analysis plan (protocol; the study was not registered)
 requirements.txt  dependencies (derived from imports)
 DATA_AVAILABILITY.md  data sources, ethics facts, what is not redistributed
-CITATION.cff      citation metadata (fill in ORCID/DOI/repository URL)
+CITATION.cff      citation metadata (author ORCIDs filled in; DOI added on publication)
 LICENSE           MIT
 ```
 
