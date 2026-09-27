@@ -1,0 +1,5 @@
+# 保住「随包发布的数据 == 权威真源」的字节相等：禁止 git 对结果数据做行尾转换
+results/** -text
+*.json -text
+*.zip -text
+*.pdf -text
