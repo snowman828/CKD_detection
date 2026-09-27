@@ -66,8 +66,59 @@ def pick(df, key):
     cand = [c for c in df.columns if re.search(PAT[key], str(c), re.I)]
     return cand[0] if cand else None
 
+def _dry_run(DATA):
+    """--dry-run：不要求 KNHANES 数据，仅（1）复现冻结流程自检门（2）打印投件预备清单。"""
+    import pandas as pd
+    from xgboost import XGBClassifier
+    from sklearn.metrics import roc_auc_score
+    print("== 投件预备检查（--dry-run）==")
+    feats = ["age", "sex", "race", "poverty_ratio", "education", "bmi", "sbp", "dbp", "hba1c", "diabetes", "total_cholesterol", "hdl"]
+    print("  KNHANES 侧所需变量（12 个特征 + 2 个标签成分）：")
+    for f in feats:
+        print("     - %s" % f)
+    print("     - creatinine（血清肌酐，用于 eGFR）")
+    print("     - urine albumin + urine creatinine（用于 uACR；单位须为 mg/L 与 mg/dL，脚本内含单位门校验）")
+    print("  NHANES 侧数据目录：%s（现有 %d 个 XPT）" % (DATA, len(glob.glob(os.path.join(DATA, "*.XPT")))))
+    CYC = {"G": 2011, "H": 2013, "I": 2015}
+    def nhanes(cyc):
+        L = lambda n: pd.read_sas(os.path.join(DATA, f"{n}_{cyc}.XPT"), format="xport")
+        dem, alb, bio = L("DEMO"), L("ALB_CR"), L("BIOPRO")
+        bpx, bmx, diq, ghb, tc, hd = L("BPX"), L("BMX"), L("DIQ"), L("GHB"), L("TCHOL"), L("HDL")
+        x = dem[["SEQN", "RIDAGEYR", "RIAGENDR", "RIDRETH1", "INDFMPIR", "DMDEDUC2", "WTMEC2YR", "RIDEXPRG"]].copy()
+        x = x.rename(columns={"RIDAGEYR": "age", "RIAGENDR": "sex", "RIDRETH1": "race", "INDFMPIR": "poverty_ratio", "DMDEDUC2": "education", "WTMEC2YR": "wt", "RIDEXPRG": "pregnant"})
+        M = lambda s, c, p: x.merge(s[["SEQN"] + c].rename(columns={v: p + v for v in c}), on="SEQN", how="left")
+        x = M(alb, ["URXUMA", "URXUCR"], "a_"); x = M(bio, ["LBXSCR"], "b_"); x = M(bpx, ["BPXSY1", "BPXDI1"], "c_")
+        x = M(bmx, ["BMXBMI"], "d_"); x = M(diq, ["DIQ010"], "e_"); x = M(ghb, ["LBXGH"], "f_"); x = M(tc, ["LBXTC"], "g_"); x = M(hd, ["LBDHDD"], "g_")
+        x["uacr"] = (x["a_URXUMA"] * 100.0 / x["a_URXUCR"]).where(x["a_URXUCR"] > 0)
+        x["creatinine"] = x["b_LBXSCR"]; x["sbp"] = x["c_BPXSY1"]; x["dbp"] = x["c_BPXDI1"]
+        x["bmi"] = x["d_BMXBMI"]; x["hba1c"] = x["f_LBXGH"]; x["total_cholesterol"] = x["g_LBXTC"]; x["hdl"] = x["g_LBDHDD"]
+        x["diabetes"] = np.where(x["e_DIQ010"] == 1, 1.0, np.where(x["e_DIQ010"] == 2, 0.0, np.nan))
+        kk = np.where(x["sex"] == 2, 0.7, 0.9); aa = np.where(x["sex"] == 2, -0.241, -0.302); ss = x["creatinine"] / kk
+        x["egfr"] = (142.0 * np.minimum(ss, 1.0) ** aa * np.maximum(ss, 1.0) ** (-1.200) * 0.9938 ** x["age"] * np.where(x["sex"] == 2, 1.012, 1.0))
+        x["ckd"] = ((x["egfr"] < 60) | (x["uacr"] >= 30)).astype(float)
+        return x[(x["age"] >= 18) & (x["pregnant"] != 1) & x["ckd"].notna()]
+    dev = pd.concat([nhanes(c) for c in CYC], ignore_index=True); val = nhanes("J")
+    def enc(X):
+        X = X.copy(); X["race_black"] = (X["race"] == 4).astype(float); X["race_hisp"] = X["race"].isin([1, 2]).astype(float)
+        X["race_other"] = (~X["race"].isin([1, 2, 3, 4])).astype(float); X["female"] = (X["sex"] == 2).astype(float)
+        return X.drop(columns=["race", "sex"])
+    med2 = enc(dev[FEATURES]).median()
+    F = lambda X: pd.concat([X.fillna(med2), X.isna().add_prefix("miss_")], axis=1)
+    Xtr, Xv = F(enc(dev[FEATURES])), F(enc(val[FEATURES]))
+    xgb = XGBClassifier(n_estimators=300, max_depth=4, learning_rate=0.05, subsample=0.8, colsample_bytree=0.8, eval_metric="logloss", n_jobs=4, random_state=42).fit(Xtr, dev["ckd"].values)
+    a17 = roc_auc_score(val["ckd"].values, xgb.predict_proba(Xv)[:, 1])
+    print("  自检门：NHANES 2017–2018 XGB AUC=%.4f（须=0.8099）%s" % (a17, "✅" if abs(a17 - 0.8099) <= 1e-4 else "❌ 漂移"))
+    ok = abs(a17 - 0.8099) <= 1e-4
+    print("  结论：%s —— 数据落位后即可直接运行（无需再改脚本）" % ("流程健康，等待 KNHANES 原始文件" if ok else "流程漂移，须先排查"))
+    return 0 if ok else 1
+
+
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--knh", required=True); a = ap.parse_args()
+    ap = argparse.ArgumentParser(); ap.add_argument("--knh", required=False, default=None)
+    ap.add_argument("--dry-run", action="store_true"); a = ap.parse_args()
+    if a.dry_run:
+        sys.exit(_dry_run(DATA))
+    if not a.knh: sys.exit("❌ 请提供 --knh <目录>（或使用 --dry-run 做预备检查）")
     if not os.path.isdir(a.knh): sys.exit(f"❌ 目录不存在: {a.knh}")
     files = load_dir(a.knh)
     print(f"发现 {len(files)} 个数据文件")
