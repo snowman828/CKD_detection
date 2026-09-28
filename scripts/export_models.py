@@ -22,6 +22,21 @@ RES = os.environ.get("CKD-detection_RESULTS_DIR", r"results")
 OUT = os.path.join(BASE, "models")
 os.makedirs(OUT, exist_ok=True)
 
+# ---- 前置检查：缺 gitignored 中间产物时给出可执行引导，而非裸 traceback ----
+_REQUIRED = [os.path.join(RES, "cohort.parquet"), os.path.join(RES, "model_results.json")]
+_missing = [p for p in _REQUIRED if not os.path.exists(p)]
+if _missing:
+    import sys as _sys
+    print("❌ export_models.py 缺少必需输入（gitignored 中间产物，不随 GitHub 分发）：")
+    for p in _missing:
+        print(f"   - {os.path.basename(p)}")
+    print("  这些由公开 NHANES 数据重建（见 README “Track 2 — full pipeline”）：")
+    print("      python scripts/download_nhanes.py   # 4 个临床周期文件")
+    print("      python scripts/build_cohort.py     # cohort.parquet")
+    print("      python scripts/modeling.py         # model_results.json + test_proba_*.npy")
+    print("  之后重跑本脚本即可复现 models/ 全部产物 + 自检。")
+    _sys.exit(1)
+
 FEATURES = ["age", "sex", "race", "poverty_ratio", "education", "bmi",
             "sbp", "dbp", "hba1c", "diabetes", "total_cholesterol", "hdl"]
 TARGET = "ckd"

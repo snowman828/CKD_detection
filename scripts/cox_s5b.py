@@ -6,7 +6,7 @@ import pandas as pd, numpy as np, json, os
 from lifelines import CoxPHFitter
 from lifelines.utils import concordance_index
 
-BASE = r"09_"
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 仓根（GitHub 检出即可运行）
 cohort = pd.read_parquet(os.path.join(BASE, "results/cohort.parquet"))
 
 FEATURES = ["age","sex","race","poverty_ratio","education","bmi","sbp","dbp",

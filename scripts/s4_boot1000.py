@@ -8,7 +8,7 @@ from xgboost import XGBClassifier
 from sklearn.metrics import roc_auc_score
 from scipy.optimize import minimize
 
-BASE = r"09_"
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 仓根（GitHub 检出即可运行）
 cohort = pd.read_parquet(os.path.join(BASE, "results/cohort.parquet"))
 
 FEATURES = ["age","sex","race","poverty_ratio","education","bmi","sbp","dbp",

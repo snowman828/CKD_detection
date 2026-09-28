@@ -15,7 +15,7 @@ for k, v in libs.items():
     print(f"  {k}: {v}")
 
 # 2. NNS 计算（真源数字）
-BASE = r"09_"
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 仓根（GitHub 检出即可运行）
 d = json.load(open(os.path.join(BASE, "results/model_results.json"), encoding="utf-8"))
 xgb = d["XGB"]
 sens, spec = xgb["sens"], xgb["spec"]

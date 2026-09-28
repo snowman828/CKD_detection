@@ -202,20 +202,50 @@ def figure5():
     ax.legend(handles=handles, **{**LEG, "bbox_to_anchor": (0.5, -0.135), "ncol": 6, "handlelength": 1.0, "columnspacing": 0.9})
     return _save(fig, "Figure5")
 
+def _missing(paths):
+    return [p for p in paths if not os.path.exists(p)]
+
 if __name__ == "__main__":
-    y, px, pl, pm, test, coh = load_preds()
-    pa, pr, auc_a, auc_r = baselines(y, test, coh)
-    print(f"[基线] Age-only={auc_a:.4f} | 临床规则={auc_r:.4f} | XGB={roc_auc_score(y, px):.4f} | LR={roc_auc_score(y, pl):.4f} | MLP={roc_auc_score(y, pm):.4f}")
-    outs = [figure1(), figure2(y, px, pl, pm, pa, pr), figure3(y, px, pl, pr), figure4(y, px, pl, pr), figure5()]
-    import pymupdf
-    print("[产出 + 字号自检]")
-    for pdf, png in outs:
-        d = pymupdf.open(pdf); sizes = []
-        for pg in d:
-            for b in pg.get_text("dict")["blocks"]:
-                for l in b.get("lines", []):
-                    for s in l["spans"]:
-                        if s["text"].strip(): sizes.append(round(s["size"], 1))
-        print(f"   {os.path.basename(pdf):13s} {os.path.getsize(pdf)//1024:4d} KB | span {len(sizes):3d} | 最小 {min(sizes)} pt "
-              f"{'✅' if min(sizes) >= 8.0 else '❌'} | 页 {d[0].rect.width/72*25.4:.0f}×{d[0].rect.height/72*25.4:.0f} mm")
-        d.close()
+    need = [os.path.join(RES, f) for f in
+            ("test_y.npy", "test_proba_xgb.npy", "test_proba_lr.npy",
+             "test_proba_mlp.npy", "test_set.parquet", "cohort.parquet")]
+    missing = _missing(need)
+
+    # Figure 1 & 5 depend ONLY on repo-local results/*.json → always runnable
+    # from a fresh GitHub checkout (no .npy/.parquet required).
+    outs = [figure1(), figure5()]
+    print("[Fig 1 & 5] 已生成（仅依赖仓内 results/*.json）：Figure1.pdf / Figure5.pdf")
+
+    if missing:
+        names = ", ".join(os.path.basename(p) for p in missing)
+        print("\n⚠  中间产物缺失（gitignored，不随 GitHub 分发）：")
+        print(f"    {names}")
+        print("  这些文件由公开 NHANES 数据重建（见 README “Track 2 — full pipeline”）：")
+        print("      python scripts/download_nhanes.py    # 下载 4 个临床周期")
+        print("      python scripts/build_cohort.py      # 构建 cohort.parquet")
+        print("      python scripts/modeling.py          # 产出 test_proba_*.npy / test_set.parquet")
+        print("  重建后重跑本脚本即可生成 Fig 2–4（ROC / 校准 / 决策曲线）。")
+        print("  本次已输出 Fig 1 & 5；Fig 2–4 跳过。")
+    else:
+        y, px, pl, pm, test, coh = load_preds()
+        pa, pr, auc_a, auc_r = baselines(y, test, coh)
+        print(f"[基线] Age-only={auc_a:.4f} | 临床规则={auc_r:.4f} | XGB={roc_auc_score(y, px):.4f} | LR={roc_auc_score(y, pl):.4f} | MLP={roc_auc_score(y, pm):.4f}")
+        outs += [figure2(y, px, pl, pm, pa, pr), figure3(y, px, pl, pr), figure4(y, px, pl, pr)]
+        print("[Fig 2–4] 已生成")
+
+    # Font-size self-check (pymupdf optional — figures are produced regardless)
+    try:
+        import pymupdf
+        print("\n[字号自检]")
+        for pdf, png in outs:
+            d = pymupdf.open(pdf); sizes = []
+            for pg in d:
+                for b in pg.get_text("dict")["blocks"]:
+                    for l in b.get("lines", []):
+                        for s in l["spans"]:
+                            if s["text"].strip(): sizes.append(round(s["size"], 1))
+            print(f"   {os.path.basename(pdf):13s} {os.path.getsize(pdf)//1024:4d} KB | span {len(sizes):3d} | 最小 {min(sizes)} pt "
+                  f"{'✅' if min(sizes) >= 8.0 else '❌'} | 页 {d[0].rect.width/72*25.4:.0f}×{d[0].rect.height/72*25.4:.0f} mm")
+            d.close()
+    except ImportError:
+        print("\n(pymupdf 未安装：跳过字号自检。`pip install pymupdf` 后重跑可校验。)")

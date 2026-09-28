@@ -12,6 +12,9 @@ data/
 *.zip
 *.tar.gz
 results/_prev_*/
+# regenerated figure / verification output (produced by make_cjasn_figures.py / verify_refs.py)
+results/figures_cjasn_v2/
+results/ref_verification_raw.json
 .DS_Store
 Thumbs.db
 *.bak*

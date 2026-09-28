@@ -16,7 +16,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from xgboost import XGBClassifier
 
-PROJ = r"09_"
+PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 仓根（GitHub 检出即可运行）
 DATA, OUT = os.path.join(PROJ, "data"), os.path.join(PROJ, "results")
 FEATURES = ["age", "sex", "race", "poverty_ratio", "education", "bmi", "sbp", "dbp", "hba1c", "diabetes", "total_cholesterol", "hdl"]
 RNG, YTHR = 2026, 0.1602

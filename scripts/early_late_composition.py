@@ -5,7 +5,7 @@
 """
 import pandas as pd, os
 
-BASE = r"09_"
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 仓根（GitHub 检出即可运行）
 cohort = pd.read_parquet(os.path.join(BASE, "results/cohort.parquet"))
 test = cohort[cohort["year"] == 2017]
 ckd = test["ckd"] == 1

@@ -137,9 +137,9 @@ def md_to_docx(md_path, out_path, figure_map=None):
             title, desc, path = fig_match.group(1), fig_match.group(2), fig_match.group(3)
             full = os.path.join(os.path.dirname(md_path), path) if not os.path.isabs(path) else path
             if not os.path.exists(full):
-                # 尝试相对 09 目录 / 项目根
-                for base in [r"09_",
-                             r""]:
+                # 尝试相对仓根 / 当前目录（GitHub 检出后由仓根解析相对图片路径）
+                for base in [os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                              r""]:
                     alt = os.path.join(base, path)
                     if os.path.exists(alt):
                         full = alt; break
