@@ -64,7 +64,7 @@ def main():
     knh_ok = os.path.isdir(os.path.join(PROJ, "data", "knh"))
     print(f"[env] python={PY}\n[env] data/ 在场={data_ok}  data/knh/ 在场={knh_ok}")
 
-    todo = [s for s in STAGES if (not a.stages) or (s[0] in a.stages)]
+    to_run = [s for s in STAGES if (not a.stages) or (s[0] in a.stages)]
     log = {"started": time.strftime("%Y-%m-%d %H:%M:%S"), "python": PY,
            "stages": [], "before": {}, "after": {}}
 
@@ -79,7 +79,7 @@ def main():
         p = os.path.join(PROJ, "results", rel.replace("/", os.sep))
         log["before"][rel] = h(p)
 
-    for name, script, desc in todo:
+    for name, script, desc in to_run:
         if not os.path.exists(script):
             log["stages"].append({"stage": name, "ok": False, "error": "脚本不存在", "path": script})
             print(f"  ⚠️ {name}: 脚本不存在 {script}")
