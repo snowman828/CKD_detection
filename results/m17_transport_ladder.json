@@ -1,0 +1,154 @@
+{
+ "design": {
+  "purpose": "held-out transport recalibration ladder + empirical local sample-size rule",
+  "target_system": "KNHANES 2022-2024 (pooled), frozen race-blind NHANES model applied without refitting",
+  "folds": 5,
+  "seed": 20261004,
+  "sample_size_grid": [
+   200,
+   400,
+   800,
+   1600,
+   3200,
+   6400
+  ],
+  "reps_per_size": 200,
+  "run_at": "2026-10-04 08:27:43"
+ },
+ "self_check": {
+  "race_blind_temporal_auc": 0.8065,
+  "expected": 0.8065,
+  "passed": true
+ },
+ "target_cohort": {
+  "n": 17045,
+  "n_ckd": 1525,
+  "ckd_pct": 8.95,
+  "auc_frozen": 0.7791,
+  "ece_raw": 0.0732
+ },
+ "held_out_ladder": {
+  "rung0_none": {
+   "ece": 0.0734,
+   "auc": 0.7791,
+   "mean_pred": 0.1626,
+   "obs": 0.0895,
+   "ece_sd": 0.0021
+  },
+  "rung1_intercept": {
+   "ece": 0.0113,
+   "auc": 0.7791,
+   "mean_pred": 0.0895,
+   "obs": 0.0895,
+   "ece_sd": 0.0052
+  },
+  "rung2_slope_intercept": {
+   "ece": 0.0109,
+   "auc": 0.7791,
+   "mean_pred": 0.0894,
+   "obs": 0.0895,
+   "ece_sd": 0.0032
+  },
+  "rung3_local_refit": {
+   "ece": 0.011,
+   "auc": 0.7945,
+   "mean_pred": 0.0895,
+   "obs": 0.0895,
+   "ece_sd": 0.0019
+  }
+ },
+ "sample_size_curve": [
+  {
+   "n_calib": 200,
+   "reps_used": 72,
+   "events_calib_median": 21,
+   "held_out_ece_median": 0.0169,
+   "held_out_ece_p90": 0.0382,
+   "held_out_auc_median": 0.7792,
+   "held_out_auc_iqr_width": 0.0009,
+   "held_out_auc_p025": 0.7775,
+   "held_out_auc_p975": 0.78
+  },
+  {
+   "n_calib": 400,
+   "reps_used": 200,
+   "events_calib_median": 35,
+   "held_out_ece_median": 0.0104,
+   "held_out_ece_p90": 0.0233,
+   "held_out_auc_median": 0.7791,
+   "held_out_auc_iqr_width": 0.0012,
+   "held_out_auc_p025": 0.7775,
+   "held_out_auc_p975": 0.781
+  },
+  {
+   "n_calib": 800,
+   "reps_used": 200,
+   "events_calib_median": 72,
+   "held_out_ece_median": 0.0078,
+   "held_out_ece_p90": 0.0172,
+   "held_out_auc_median": 0.7789,
+   "held_out_auc_iqr_width": 0.0017,
+   "held_out_auc_p025": 0.7763,
+   "held_out_auc_p975": 0.7819
+  },
+  {
+   "n_calib": 1600,
+   "reps_used": 200,
+   "events_calib_median": 142,
+   "held_out_ece_median": 0.007,
+   "held_out_ece_p90": 0.0118,
+   "held_out_auc_median": 0.7791,
+   "held_out_auc_iqr_width": 0.0026,
+   "held_out_auc_p025": 0.7756,
+   "held_out_auc_p975": 0.7823
+  },
+  {
+   "n_calib": 3200,
+   "reps_used": 200,
+   "events_calib_median": 286,
+   "held_out_ece_median": 0.0069,
+   "held_out_ece_p90": 0.0094,
+   "held_out_auc_median": 0.779,
+   "held_out_auc_iqr_width": 0.0047,
+   "held_out_auc_p025": 0.7739,
+   "held_out_auc_p975": 0.7859
+  },
+  {
+   "n_calib": 6400,
+   "reps_used": 200,
+   "events_calib_median": 571,
+   "held_out_ece_median": 0.0074,
+   "held_out_ece_p90": 0.01,
+   "held_out_auc_median": 0.7791,
+   "held_out_auc_iqr_width": 0.0063,
+   "held_out_auc_p025": 0.7719,
+   "held_out_auc_p975": 0.7901
+  }
+ ],
+ "rules": {
+  "ECE_median_le_0.02": {
+   "n_calib": 200,
+   "reps_used": 72,
+   "events_calib_median": 21,
+   "held_out_ece_median": 0.0169,
+   "held_out_ece_p90": 0.0382,
+   "held_out_auc_median": 0.7792,
+   "held_out_auc_iqr_width": 0.0009,
+   "held_out_auc_p025": 0.7775,
+   "held_out_auc_p975": 0.78
+  },
+  "AUC_ciwidth_le_0.05": {
+   "n_calib": 200,
+   "reps_used": 72,
+   "events_calib_median": 21,
+   "held_out_ece_median": 0.0169,
+   "held_out_ece_p90": 0.0382,
+   "held_out_auc_median": 0.7792,
+   "held_out_auc_iqr_width": 0.0009,
+   "held_out_auc_p025": 0.7775,
+   "held_out_auc_p975": 0.78
+  },
+  "note": "n_calib = 目标体系可用于本地重校准的个体数（事件数为其经验中位）；held-out 评估用其余个体。"
+ },
+ "elapsed_sec": 16.4
+}

@@ -1,0 +1,178 @@
+{
+ "design": {
+  "linkage": "NHANES Linked Mortality Files 2019 (public), eligstat==1",
+  "sample": "cohort (2011-2018, 4 cycles) linked to mortality, adults",
+  "n_cohort": 23578,
+  "n_linked_eligible": 22293,
+  "weights": "WTMEC2YR/4 (4 two-year cycles combined)",
+  "post_hoc": true,
+  "causal_claim": false,
+  "run_at": "2026-10-04 07:56:25"
+ },
+ "descriptives": {
+  "by_ckd_status": {
+   "ckd": {
+    "n": 3742,
+    "all_cause_deaths": 609,
+    "cvd_deaths": 190,
+    "person_years": 17164.0,
+    "median_followup_years": 4.33,
+    "weighted_mortality_per_1000py": 31.79,
+    "weighted_cvd_per_1000py": 10.06
+   },
+   "no_ckd": {
+    "n": 18551,
+    "all_cause_deaths": 599,
+    "cvd_deaths": 113,
+    "person_years": 93079.8,
+    "median_followup_years": 5.0,
+    "weighted_mortality_per_1000py": 5.23,
+    "weighted_cvd_per_1000py": 0.92
+   }
+  },
+  "overall": {
+   "n": 22293,
+   "all_cause_deaths": 1208,
+   "cvd_deaths": 303,
+   "person_years": 110243.8,
+   "median_followup_years": 4.92
+  }
+ },
+ "Q1_ckd_label_vs_death": {
+  "mort": {
+   "hr": 1.99,
+   "ci95": [
+    1.832,
+    2.161
+   ],
+   "p": 5.628628469183383e-60,
+   "n": 22293,
+   "events": 1208,
+   "adjusted_for": [
+    "age",
+    "female",
+    "race_black",
+    "race_hisp",
+    "race_other"
+   ],
+   "weighted": false,
+   "ph_test_p": 0.4028
+  },
+  "mort_weighted_sensitivity": "unavailable: KeyError",
+  "cvd": {
+   "hr": 1.473,
+   "ci95": [
+    1.329,
+    1.632
+   ],
+   "p": 1.4952351199030067e-13,
+   "n": 22293,
+   "events": 303,
+   "adjusted_for": [
+    "age",
+    "female",
+    "race_black",
+    "race_hisp",
+    "race_other"
+   ],
+   "weighted": false,
+   "ph_test_p": 0.5041
+  },
+  "cvd_weighted_sensitivity": "unavailable: KeyError"
+ },
+ "Q2_score_prognostic_value": {
+  "mort": {
+   "development_OOF": {
+    "c_index_score": 0.8219,
+    "c_index_age_only": 0.8323,
+    "delta_c": -0.0104,
+    "delta_c_ci95": [
+     -0.0193,
+     -0.0027
+    ],
+    "boot_reps_used": 500,
+    "n": 16917,
+    "events": 1145
+   },
+   "temporal_validation_frozen": {
+    "c_index_score": 0.8009,
+    "c_index_age_only": 0.8276,
+    "delta_c": -0.0267,
+    "delta_c_ci95": [
+     -0.0598,
+     0.0086
+    ],
+    "boot_reps_used": 500,
+    "n": 5376,
+    "events": 63
+   },
+   "hr_per_sd_development": {
+    "hr_per_sd": 1.462,
+    "ci95": [
+     1.414,
+     1.512
+    ],
+    "p": 6.37330158676613e-110,
+    "adjusted_for": [
+     "age",
+     "female",
+     "race_black",
+     "race_hisp",
+     "race_other"
+    ],
+    "n": 16917,
+    "events": 1145
+   }
+  },
+  "cvd": {
+   "development_OOF": {
+    "c_index_score": 0.861,
+    "c_index_age_only": 0.8525,
+    "delta_c": 0.0085,
+    "delta_c_ci95": [
+     -0.008,
+     0.0243
+    ],
+    "boot_reps_used": 500,
+    "n": 16917,
+    "events": 286
+   },
+   "temporal_validation_frozen": {
+    "c_index_score": 0.8791,
+    "c_index_age_only": 0.9245,
+    "delta_c": -0.0454,
+    "delta_c_ci95": [
+     -0.0836,
+     0.0023
+    ],
+    "boot_reps_used": 500,
+    "n": 5376,
+    "events": 17
+   },
+   "hr_per_sd_development": {
+    "hr_per_sd": 1.245,
+    "ci95": [
+     1.193,
+     1.3
+    ],
+    "p": 1.5640875336741803e-23,
+    "adjusted_for": [
+     "age",
+     "female",
+     "race_black",
+     "race_hisp",
+     "race_other"
+    ],
+    "n": 16917,
+    "events": 286
+   }
+  }
+ },
+ "disclosures": {
+  "post_hoc": "该分析不在预注册方案内，属投稿后探索性分析",
+  "power": "开发期联动样本人-年与事件数见各条目；时间外验证集事件数少（见 n_test_events），结论标为探索性",
+  "ph_assumption": "对 CKD 标签模型做了比例风险检验（rank 变换），结果见 Q1_*_ph_test_p",
+  "no_causal_claim": "本分析仅报告关联，不声称因果；不作为部署或替代肾脏化验的依据",
+  "bootstrap_reps": 500
+ }
+}
