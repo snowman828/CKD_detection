@@ -1,4 +1,6 @@
 cff-version: 1.2.0
+version: "1.0.0"
+date-released: "2026-10-04"
 message: "If you use this code, please cite the accompanying article (citation to be completed on publication)."
 title: "CKD-detection: detection of chronic kidney disease from routine non-kidney-specific clinical data (NHANES 2011-2018)"
 authors:
