@@ -1,0 +1,39 @@
+{
+  "title": "CKD-detection: detection of chronic kidney disease from routine non-kidney-specific clinical data (NHANES 2011-2018)",
+  "upload_type": "software",
+  "version": "1.0.0",
+  "language": "eng",
+  "access_right": "open",
+  "license": "MIT",
+  "creators": [
+    {
+      "name": "Zhao, Yixin",
+      "orcid": "0009-0002-2452-4813",
+      "affiliation": "Chinese PLA General Hospital"
+    },
+    {
+      "name": "Zhang, Zhiyong",
+      "orcid": "0009-0006-2668-3761",
+      "affiliation": "Chinese PLA General Hospital"
+    },
+    {
+      "name": "Wang, Dawei",
+      "orcid": "0000-0001-9323-0144",
+      "affiliation": "Chinese PLA General Hospital"
+    }
+  ],
+  "description": "Analysis code and derived result files for a two-step CKD detection model developed in NHANES 2011-2018 (4 cycles; development 2011-2016, temporal validation 2017-2018) and externally applied to KNHANES 2022-2024. Includes: (i) the frozen model pipeline (race-blind primary specification); (ii) a held-out transport recalibration ladder with an empirical local sample-size rule (scripts/m17_transport_ladder.py); (iii) a one-command full rerun (scripts/rerun_all.py --check; 7 stages, built-in frozen-value self-checks that abort on pipeline drift); (iv) a post-hoc mortality linkage analysis in NHANES 2011-2018 linked mortality file (m16). Reproducibility status: a full rerun reproduces the reported core values exactly (AUC_ext 0.8099; KNHANES 0.7713/0.7791; mortality HR 1.99; delta-C -0.0104; recalibrated ECE 0.0113); three known divergences are documented in REPRODUCE.md. NHANES and KNHANES microdata are not redistributed.",
+  "keywords": [
+    "chronic kidney disease",
+    "CKD screening",
+    "NHANES",
+    "KNHANES",
+    "prediction model",
+    "external validation",
+    "recalibration",
+    "transportability",
+    "health equity",
+    "reproducibility"
+  ],
+  "notes": "Released together with the manuscript submission. Derived result files only; source microdata must be obtained from CDC/NCHS (NHANES) and KDCA (KNHANES)."
+}
