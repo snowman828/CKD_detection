@@ -9,7 +9,8 @@
            （年龄-only 与三变量临床规则在开发集拟合，随机种子固定）；Fig5 用正文 Table 3 权威值（与台账一致）。
 【输出】PDF（矢量、字体嵌入 fonttype=42）+ PNG(600 dpi)，落 results/figures_cjasn_v2/
 """
-import os, re, json, itertools
+import os
+import sys, re, json, itertools
 import numpy as np, pandas as pd
 import matplotlib
 matplotlib.use("Agg")
@@ -24,7 +25,9 @@ from xgboost import XGBClassifier
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RES = os.path.join(ROOT, "results")
 OUT = os.path.join(RES, "figures_cjasn_v2")
-MAN = os.environ.get("CKD_MANUSCRIPT_MD", os.path.join(ROOT, "投稿包", "01_CJASN_Detection", "CJASN_Manuscript.md"))
+MAN = os.environ.get("CKD_MANUSCRIPT_MD")
+if not MAN:
+    sys.exit("请设置环境变量 CKD_MANUSCRIPT_MD 指向稿件 .md（本脚本只负责按稿内数值出图，不内置稿件路径）")
 # 数据依赖（DATA_AVAILABILITY.md 说明）：results/test_proba_{xgb,lr,mlp}.npy、
 # test_y.npy、test_set.parquet、cohort.parquet 为 gitignore 的中间产物，
 # 由 scripts/download_nhanes.py + build_cohort.py + modeling.py 重建。

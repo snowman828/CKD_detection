@@ -14,7 +14,7 @@
   · 本分析为 **post-hoc/探索性**（不在预注册方案内），须在稿件如实标注；不声称因果
   · ΔC 的 95% CI = 配对 bootstrap（两个 C-index 在同一重抽样上重算）
 输出：results/m2/m16_mortality_a2.json
-运行：D:/hermes/scienv/Scripts/python.exe scripts/m16_mortality_a2.py
+运行：python scripts/m16_mortality_a2.py
 """
 import json, os, sys, time
 import numpy as np
@@ -25,7 +25,7 @@ from lifelines.statistics import proportional_hazard_test
 from xgboost import XGBClassifier
 from sklearn.model_selection import StratifiedKFold
 
-BASE = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行"
+BASE = os.environ.get("CKD_PIPELINE_BASE") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(BASE, "results", "m2")
 FEATURES = ["age", "sex", "race", "poverty_ratio", "education", "bmi",
             "sbp", "dbp", "hba1c", "diabetes", "total_cholesterol", "hdl"]

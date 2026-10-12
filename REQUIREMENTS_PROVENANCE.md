@@ -13,4 +13,4 @@
 - `seaborn（未取到版本）← import 命中`
 - `xgboost==3.2.0   ← import 命中`
 
-版本号取自本机科学环境（`uv pip list --python `）。
+版本号取自本项目所用科学环境（`uv pip list --python `）。

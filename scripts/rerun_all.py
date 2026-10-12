@@ -11,14 +11,14 @@
   python scripts/rerun_all.py                 # 全量
   python scripts/rerun_all.py --stages m16 m17
   python scripts/rerun_all.py --check         # 全量 + 值级比对
-运行环境：D:/hermes/scienv/Scripts/python.exe（含 pandas/lifelines/pyreadstat/xgboost）
+运行环境：python（含 pandas/lifelines/pyreadstat/xgboost）
 """
 import argparse, json, os, subprocess, sys, time
 
-PROJ = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行"
+PROJ = os.environ.get("CKD_PIPELINE_BASE") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 SCRIPTS = os.path.join(PROJ, "scripts")
-REPO_SCRIPTS = os.path.join(PROJ, "repo_public_push_ready", "scripts")
+REPO_SCRIPTS = os.path.join(PROJ, "scripts")   # 包内布局：与 SCRIPTS 同目录
 
 STAGES = [
     ("cohort",  os.path.join(SCRIPTS, "build_cohort.py"),           "队列构建（含标签/权重）"),
@@ -85,7 +85,7 @@ def main():
             print(f"  ⚠️ {name}: 脚本不存在 {script}")
             continue
         t0 = time.time()
-        r = subprocess.run([PY, script], cwd=(REPO_SCRIPTS if "repo_public_push_ready" in script else PROJ),
+        r = subprocess.run([PY, script], cwd=PROJ,
                            capture_output=True, text=True, encoding="utf-8", errors="ignore")
         dt = round(time.time() - t0, 1)
         tail = (r.stdout or "").strip().splitlines()[-3:]

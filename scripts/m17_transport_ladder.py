@@ -16,7 +16,7 @@
 口径纪律：沿用 knh_multiwave_cross_system.py 的冻结 race-blind 模型与协调化；
 双自检门（含 race=0.8099 / race-blind=0.8065）不过则中止，避免流程漂移。
 输出：results/m2/m17_transport_ladder.json
-运行：D:/hermes/scienv/Scripts/python.exe scripts/m17_transport_ladder.py
+运行：python scripts/m17_transport_ladder.py
 """
 import os, sys, json, time
 import numpy as np
@@ -27,8 +27,8 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 from sklearn.linear_model import LogisticRegression
 
-PROJ = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行"
-REPO = os.path.join(PROJ, "repo_public_push_ready")
+PROJ = os.environ.get("CKD_PIPELINE_BASE") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO = PROJ                      # 包内布局：knh 模块与 m17 同在 <pkg>/scripts
 sys.path.insert(0, os.path.join(REPO, "scripts"))
 import knh2022_cross_system as M                      # noqa: E402  (提供 PROJ/HYP/load_nhanes)
 import knh_multiwave_cross_system as MW               # noqa: E402  (提供 load_year/RB/自检门)
