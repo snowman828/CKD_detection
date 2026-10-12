@@ -30,6 +30,11 @@ CMYK and TIFF files can never drift from the vector set. Print formats need ghos
 CMYK profile; if either is missing the script **skips and prints the exact command instead of failing
 silently**.
 
+Both scripts resolve their tools portably: the ICC profile from the system colour directory (derived
+from `SystemRoot`), ghOScript from `CKD_GHOSTSCRIPT`, `PATH`, the standard install roots and the conda
+package cache — no machine-specific absolute path is hard-coded, so a third party can re-run them
+unchanged (`--icc` / `--gs` and the `CKD_CMYK_ICC` / `CKD_GHOSTSCRIPT` environment variables override).
+
 ## Verification run against the submitted files (2026-10-12)
 
 | Check | Method | Result |
@@ -40,6 +45,7 @@ silently**.
 | Figure 5 values | Ten `AUC (95% CI)` labels in the figure vs Table 3 of the manuscript | 10/10 verbatim; the dashed overall line (0.810) traces to `results/model_results.json` (0.8105) |
 | Figure 2 AUC labels | Recomputed `roc_auc_score` from the repository arrays | XGBoost 0.8099, logistic regression 0.7943, MLP 0.7695 — labels match verbatim |
 | Pipeline-level gates | `scripts/rerun_all.py --check` (see REPRODUCE.md) | aborts unless the temporal-validation AUC is 0.8099 (tolerance 1e-4); race-blind variant 0.8065 |
+| Print chain re-run with the shipped script | Ran `scripts/figures_to_print_formats.py` on a copy of the repository vector PDFs and compared with the in-production print files | identical extracted text, drawing-object counts (16/40/65/46/73) and page boxes for all five figures; the 1200 dpi CMYK TIFFs were reproduced at the same pixel dimensions and the same size to two decimal MB |
 
 ## Regenerating the figures
 
