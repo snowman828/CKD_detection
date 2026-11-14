@@ -29,6 +29,6 @@ python scripts/build_cohort.py       # build the analysis cohort (CKD-EPI 2021 e
 
 Version **1.0.0** is archived and citable via its DOI:
 
-- Version DOI: [10.5281/zenodo.23357060](https://doi.org/10.5281/zenodo.23357060)  
+- Version DOI: [10.5281/zenodo.24211598](https://doi.org/10.5281/zenodo.24211598)  
 - Concept DOI (all versions): 10.5281/zenodo.23357059  
 - Corresponding GitHub tag: [v1.0.0](https://github.com/snowman828/CKD_detection/releases/tag/v1.0.0)
