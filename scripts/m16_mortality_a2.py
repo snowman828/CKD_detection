@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
-"""A2 硬结局（NHANES 联动死亡）预后验证 — 阶段 1 新增分析（2026-10-04）
+"""Hard-endpoint prognostic validation using NHANES linked mortality files.
 
-回答三个问题（供论文 A2 轴入库）：
-  Q1【锚点】KDIGO 定义的 CKD 标签本身是否与全因/CVD 死亡相关？（证明联动管道有效、样本有功效）
-  Q2【主问题】常规数据模型评分，是否在**年龄之上**提供预后判别增量？（OOF 预测，充分功效）
-  Q3【次要】冻结模型在时间外验证集（2017–2018）的表现（事件数少 ⇒ 探索性）
+Three questions are addressed:
+  Q1 (anchor): is the KDIGO CKD label itself associated with all-cause and CVD mortality, confirming that the linkage has power?
+  Q2 (primary): does the routine-data model score add prognostic discrimination beyond age, using out-of-fold predictions?
+  Q3 (secondary): performance of the frozen model on the 2017-2018 temporal test set (few events, exploratory).
 
-设计与纪律：
-  · 联动资格：仅 eligstat==1（NHANES 官方规定）
-  · OOF 预测：在开发期（2011–2016）内部 StratifiedKFold(5, seed=42) 交叉拟合，复用 modeling.py
-    的同一特征管道（dummies + 训练集中位数插补 + 缺失指示符）与同一 XGB 超参
-  · 权重：合并 4 个 2 年周期 ⇒ 权重 WTMEC2YR/4（NHANES 官方合并规则）
-  · 本分析为 **post-hoc/探索性**（不在预注册方案内），须在稿件如实标注；不声称因果
-  · ΔC 的 95% CI = 配对 bootstrap（两个 C-index 在同一重抽样上重算）
-输出：results/m2/m16_mortality_a2.json
-运行：python scripts/m16_mortality_a2.py
+Design and discipline:
+  - Linkage eligibility: only eligstat == 1, per NHANES documentation.
+  - Out-of-fold predictions: stratified 5-fold cross-fitting within the development period, reusing the modeling.py
+    feature pipeline (dummies, training-set median imputation, missingness flags) and the same XGBoost hyperparameters.
+  - Weights: four two-year cycles combined, so WTMEC2YR/4 as prescribed by NHANES.
+  - This analysis is post hoc and exploratory, outside the pre-specified protocol; it is reported as such and no causal claim is made.
+  - The 95% CI for delta C uses a paired bootstrap that recomputes both C-indices on the same resample.
+Output: results/m2/m16_mortality_a2.json
+Run: python scripts/m16_mortality_a2.py
 """
 import json, os, sys, time
 import numpy as np
@@ -37,7 +37,7 @@ os.makedirs(OUT, exist_ok=True)
 cohort = pd.read_parquet(os.path.join(BASE, "results/cohort.parquet"))
 
 
-# ---------- 特征管道（与 modeling.py 完全一致） ----------
+# ---------- feature pipeline (identical to modeling.py) ----------
 def prep_fit(X):
     med = X.median()
 
@@ -58,7 +58,7 @@ def add_dummies(X):
     return X.drop(columns=["race", "sex"])
 
 
-# ---------- LMF 解析（官方固定宽度） ----------
+# ---------- parse the fixed-width LMF file ----------
 def read_lmf(path):
     widths = [(1, 6), (15, 15), (16, 16), (17, 19), (20, 20), (21, 21),
               (22, 22), (23, 26), (43, 45), (46, 48)]
@@ -94,7 +94,7 @@ df = df[(df["eligstat"] == 1) & df["permth_int"].notna()].reset_index(drop=True)
 df["fu_years"] = df["permth_int"] / 12.0
 df["mort"] = (df["mortstat"] == 1).astype(float)
 df["cvd"] = ((df["mortstat"] == 1) & (df["ucod_leading"] == 1)).astype(float)
-df["w"] = df["wt"].fillna(0) / 4.0          # 4 个 2 年周期合并（NHANES 规则）
+df["w"] = df["wt"].fillna(0) / 4.0          # four two-year cycles combined (NHANES rule)
 
 res = {"design": {
     "linkage": "NHANES Linked Mortality Files 2019 (public), eligstat==1",
@@ -105,7 +105,7 @@ res = {"design": {
     "run_at": time.strftime("%Y-%m-%d %H:%M:%S"),
 }}
 
-# ---------- 描述 ----------
+# ---------- descriptive statistics ----------
 by_ckd = {}
 for k, m in [("ckd", df["ckd"] == 1), ("no_ckd", df["ckd"] == 0)]:
     g = df[m]
@@ -131,7 +131,7 @@ print(f"[desc] n={len(df)} all-cause deaths={int(df['mort'].sum())} CVD deaths={
       f"median FU={df['fu_years'].median():.2f} y", flush=True)
 
 
-# ---------- Q1 锚点：CKD 标签 ↔ 死亡（校正 HR） ----------
+# ---------- Q1 anchor: CKD label versus mortality (adjusted HR) ----------
 def cox_hr_labels(ev, weighted=False):
     d = add_dummies(df[FEATURES]).assign(T=df["fu_years"].values, E=df[ev].values)
     d["ckd"] = df["ckd"].values
@@ -167,7 +167,7 @@ for ev in ("mort", "cvd"):
           f"{res['Q1_ckd_label_vs_death'][ev]['ci95']}", flush=True)
 
 
-# ---------- Q2 主问题：模型评分在年龄之上的预后增量（OOF，充分功效） ----------
+# ---------- Q2 primary: prognostic increment beyond age (out-of-fold) ----------
 X_raw = add_dummies(df[FEATURES])
 y = df[TARGET].values
 is_dev = df["year"].isin([2011, 2013, 2015]).values
@@ -179,7 +179,7 @@ X = fit(X_raw)
 xgb = XGBClassifier(n_estimators=300, max_depth=4, learning_rate=0.05, subsample=0.8,
                     colsample_bytree=0.8, eval_metric="logloss", n_jobs=4, random_state=RNG)
 
-# OOF（开发期内部 5 折）
+# out-of-fold predictions within the development period
 oof = np.full(len(df), np.nan)
 skf = StratifiedKFold(5, shuffle=True, random_state=RNG)
 Xdev, ydev = X[is_dev].reset_index(drop=True), y[is_dev]
@@ -188,11 +188,11 @@ for tr, va in skf.split(Xdev, ydev):
     xgb.fit(Xdev.iloc[tr], ydev[tr])
     oof_dev[va] = xgb.predict_proba(Xdev.iloc[va])[:, 1]
 oof[is_dev] = oof_dev
-# 冻结模型 → 时间外验证集
+# frozen model applied to the temporal test set
 xgb.fit(Xdev, ydev)
 oof[is_test] = xgb.predict_proba(X[is_test])[:, 1]
 score = oof
-print(f"[Q2] OOF 预测已生成：dev {is_dev.sum()} / test {is_test.sum()}", flush=True)
+print(f"[Q2] out-of-fold predictions generated: dev {is_dev.sum()} / test {is_test.sum()}", flush=True)
 
 
 def c_harrell(t, s, e):
@@ -259,12 +259,12 @@ for ev in ("mort", "cvd"):
     print(f"[Q2] {ev}: dev ΔC={d_['delta_c']:+.4f} {d_['delta_c_ci95']} "
           f"(C_score {d_['c_index_score']} vs C_age {d_['c_index_age_only']}, events {d_['events']})", flush=True)
 
-# ---------- 功效/披露 ----------
+# ---------- power and disclosures ----------
 res["disclosures"] = {
     "post_hoc": "not part of the pre-specified protocol; exploratory analysis",
-    "power": "开发期联动样本人-年与事件数见各条目；时间外验证集事件数少（见 n_test_events），结论标为探索性",
-    "ph_assumption": "对 CKD 标签模型做了比例风险检验（rank 变换），结果见 Q1_*_ph_test_p",
-    "no_causal_claim": "本分析仅报告关联，不声称因果；不作为部署或替代肾脏化验的依据",
+    "power": "Person-years and event counts for the development linkage are given per item; the test set has few events (n_test_events), so conclusions are exploratory.",
+    "ph_assumption": "Proportional-hazards assumption tested for the CKD-label model using a rank transform; see Q1_*_ph_test_p.",
+    "no_causal_claim": "This analysis reports associations only, makes no causal claim, and is not a basis for deployment or for replacing kidney laboratory testing.",
     "bootstrap_reps": NBOOT,
 }
 

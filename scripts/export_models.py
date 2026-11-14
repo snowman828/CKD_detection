@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-"""CKD-detection 模型产物导出(trained model artifacts for reuse)
+"""Export trained model artifacts for reuse.
 
-设计原则
-- 完全复现 `modeling.py` 的预处理与超参数（train = 2011/2013/2015；test = 2017）
-- 导出持久化产物 + 插补统计量 + 精确列顺序（推理必需）
-- **自检（不通过即中止，不静默）**：用导出的产物重新预测，各模型 test AUC 必须与
-  `results/model_results.json` 的记录值一致（|Δ| ≤ 1e-4）；并报告与
-  `results/test_proba_*.npy` 的概率最大绝对差与标签一致率
-- 输出：`models/`（xgb_model.json / lr_model.joblib / mlp_model.joblib /
+Design
+- Reproduces the preprocessing and hyperparameters of modeling.py (train 2011/2013/2015; test 2017).
+- Exports the fitted artifacts, imputation statistics and the exact column order required for inference.
+- Self-check (aborts rather than continuing silently): predictions from the exported artifacts must match
+  the recorded test AUCs in results/model_results.json (|delta| <= 1e-4), and are compared with
+  the saved probabilities for maximum absolute difference and label agreement.
+- Output: models/ (xgb_model.json, lr_model.joblib, mlp_model.joblib,
   preprocessing.json / model_metadata.json / README.md）
 """
 import hashlib, json, os, platform, sys
@@ -17,24 +17,24 @@ from sklearn.neural_network import MLPClassifier
 from xgboost import XGBClassifier
 from sklearn.metrics import roc_auc_score
 
-BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))       # repo 根
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))       # repository root
 RES = os.environ.get("CKD-detection_RESULTS_DIR", r"results")
 OUT = os.path.join(BASE, "models")
 os.makedirs(OUT, exist_ok=True)
 
-# ---- 前置检查：缺 gitignored 中间产物时给出可执行引导，而非裸 traceback ----
+# ---- precondition check: give actionable guidance when gitignored intermediates are absent ----
 _REQUIRED = [os.path.join(RES, "cohort.parquet"), os.path.join(RES, "model_results.json")]
 _missing = [p for p in _REQUIRED if not os.path.exists(p)]
 if _missing:
     import sys as _sys
-    print("❌ export_models.py required inputs are missing（gitignored 中间产物，不随 GitHub 分发）：")
+    print("❌ export_models.py required inputs are missing(gitignored intermediates, not distributed with the repository):")
     for p in _missing:
         print(f"   - {os.path.basename(p)}")
-    print("  这些由公开 NHANES 数据重建（见 README “Track 2 — full pipeline”）：")
-    print("      python scripts/download_nhanes.py   # 4 个临床周期文件")
+    print("  They are rebuilt from public NHANES data (see README, Track 2 - full pipeline):")
+    print("      python scripts/download_nhanes.py   # four clinical-cycle files")
     print("      python scripts/build_cohort.py     # cohort.parquet")
     print("      python scripts/modeling.py         # model_results.json + test_proba_*.npy")
-    print("  之后重跑本脚本即可复现 models/ 全部产物 + 自检。")
+    print("  Then re-run this script to reproduce every artifact in models/ and its self-check.")
     _sys.exit(1)
 
 FEATURES = ["age", "sex", "race", "poverty_ratio", "education", "bmi",
@@ -54,7 +54,7 @@ def add_dummies(X):
     return X.drop(columns=["race", "sex"])
 
 Xtr_raw, Xte_raw = add_dummies(train[FEATURES]), add_dummies(test[FEATURES])
-med = Xtr_raw.median()                       # 仅在训练集拟合（与 modeling.py 一致）
+med = Xtr_raw.median()                       # fitted on the training set only, as in modeling.py
 
 def transform(X_):
     X_ = X_.copy()
@@ -64,8 +64,8 @@ def transform(X_):
 
 Xtr, Xte = transform(Xtr_raw), transform(Xte_raw)
 ytr, yte = train[TARGET].values, test[TARGET].values
-print(f"train {Xtr.shape} | test {Xte.shape} | 编码后列数={Xte.shape[1]}（原始 12 变量 → 哑变量/指示符展开）")
-print(f"  编码列顺序: {list(Xte.columns)}")
+print(f"train {Xtr.shape} | test {Xte.shape} | encoded columns={Xte.shape[1]}(12 raw variables expanded into dummies and indicators)")
+print(f"  encoded column order: {list(Xte.columns)}")
 
 MODELS = {
     "LR": LogisticRegression(max_iter=2000, C=0.1),
@@ -94,13 +94,13 @@ for name, model in MODELS.items():
     checks[name] = {"auc_recomputed": round(auc, 6), "auc_published": ref_auc,
                     "abs_diff": round(abs(auc - ref_auc), 8), "pass": ok,
                     "max_prob_diff_vs_archive": maxdiff, "label_agreement": agree}
-    print(f"[{name}] AUC 重算={auc:.6f} 已发表={ref_auc:.6f} |Δ|={abs(auc-ref_auc):.2e} {'✅' if ok else '❌'}"
-          + (f" | 与存档概率最大差={maxdiff:.2e} 标签一致={agree:.1%}" if maxdiff is not None else ""))
+    print(f"[{name}] AUC recomputed={auc:.6f} 已发表={ref_auc:.6f} |delta|= {abs(auc-ref_auc):.2e} {'✅' if ok else '❌'}"
+          + (f" | max difference vs saved probabilities={maxdiff:.2e} label agreement={agree:.1%}" if maxdiff is not None else ""))
 
 if not all(c["pass"] for c in checks.values()):
-    sys.exit("❌ 自检未通过：导出模型与已发表结果不一致 —— 中止（不产出不合格产物）")
+    sys.exit("self-check failed: exported model disagrees with the published results; aborting without writing artifacts")
 
-# ---------- 导出产物 ----------
+# ---------- export artifacts ----------
 MODELS["XGB"].save_model(os.path.join(OUT, "xgb_model.json"))
 import joblib
 joblib.dump(MODELS["LR"], os.path.join(OUT, "lr_model.joblib"))
@@ -190,7 +190,7 @@ No protected health information is included; all inputs derive from public NHANE
 """
 open(os.path.join(OUT, "README.md"), "w", encoding="utf-8").write(readme)
 
-print("\n=== 导出完成 ===")
+print("\n=== export complete ===")
 for f, d in arts.items():
     print(f"  {f:<22} {d['bytes']:>9,} B  sha256 {d['sha256'][:16]}")
 print("  README.md / model_metadata.json")

@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
-"""#4 标签操纵敏感性（预注册：analysis_plan/labelmanip_prereg.json）
-两阶段：
-  --stage labels  仅做功效诊断（不训练）：去年龄标签的改变率/患病率/严重度构成
-  --stage run     2×2（标签×特征）重训 + 盲区层 ΔAUC 配对 bootstrap，按预注册判据出判决
-  --stage both    先诊断后训练（推荐）
-证据纪律：不覆盖 cohort.parquet；模型配方/seed/B 与主分析一致；CI 一律来自实际重抽。
+"""Label-manipulation sensitivity analysis (pre-registered in analysis_plan/labelmanip_prereg.json).
+Two stages:
+  --stage labels  power diagnostics only, without training: change rate, prevalence and severity composition under age-free labels
+  --stage run     2x2 retraining (label x feature set) with a paired bootstrap for the blind-stratum delta AUC, judged against the pre-registered rule
+  --stage both    diagnostics then training (recommended)
+Evidence discipline: cohort.parquet is never modified; model recipe, seed and B match the main analysis; every CI comes from actual resampling.
 """
 import os, sys, json, time, argparse
 import numpy as np, pandas as pd
 from xgboost import XGBClassifier
 from sklearn.metrics import roc_auc_score
 
-BASE = r"G:/项目文件/CKD多模态AI早诊_本项目专属归档/09_无湿实验执行"
+BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTD = os.path.join(BASE, "results/m2/labelmanip")
 FEATURES = ["age", "sex", "race", "poverty_ratio", "education", "bmi", "sbp", "dbp",
             "hba1c", "diabetes", "total_cholesterol", "hdl"]
 B, SEED = 2000, 20261014
 RNG = np.random.default_rng(SEED)
-D_ORIG = 0.0258          # 预注册基线（results/m2/ci_bootstrap_3items.json）
+D_ORIG = 0.0258          # pre-registered baseline (results/m2/ci_bootstrap_3items.json)
 
 
 def ad(X):
@@ -72,8 +72,8 @@ def stage_labels(df):
                               "chg": round(float((s["ckd"] != s["ckd_nf"]).mean()), 4),
                               "blind_chg": round(float((sb["ckd"] != sb["ckd_nf"]).mean()), 4) if len(sb) else None}
     res["power_ok"] = bool(res["chg_blind"] >= 0.05)
-    res["verdict"] = ("操纵有功效，可进入 run" if res["power_ok"]
-                      else "INCONCLUSIVE（盲区层改变率<5%，操纵无功效；不得解释为阴性）")
+    res["verdict"] = ("manipulation has power; proceed to run" if res["power_ok"]
+                      else "INCONCLUSIVE (blind-stratum change rate below 5%, no power; not to be read as a negative result)")
     return res
 
 
@@ -96,7 +96,7 @@ def stage_run(df):
         teb = te[te["uacr"] < 30].reset_index(drop=True)
         y = teb[label].values
         if y.min() == y.max():
-            out["cells"][label] = {"error": "盲区层单一类别，无法评估"}; continue
+            out["cells"][label] = {"error": "single-class blind stratum; cannot be evaluated"}; continue
         feats_nf = [f for f in FEATURES if f != "age"]
         preds = {"age-only": fit_arm(trb, teb, label, ["age"]),
                  "full": fit_arm(trb, teb, label, FEATURES),
@@ -118,11 +118,11 @@ def stage_run(df):
                                      "n_boot_used": len(d),
                                      "ci_excludes_zero": bool(np.percentile(d, 2.5) > 0 or np.percentile(d, 97.5) < 0)}
         out["cells"][label] = cell
-        print("[%s] 盲区 n=%d case=%d | AUC %s | Δfull %s %s | Δno-age %s %s"
+        print("[%s] blind n=%d cases=%d | AUC %s | delta full %s %s | delta no-age %s %s"
               % (label, n, int(y.sum()), auc, cell["delta_full"]["delta"], cell["delta_full"]["ci95"],
                  cell["delta_full_no-age"]["delta"] if False else cell["delta_full-no-age"]["delta"],
                  cell["delta_full-no-age"]["ci95"]), flush=True)
-    # ---- 按预注册判据出判决（含功效下限：n_case<50 的格不参与假设检验）----
+    # ---- apply the pre-registered decision rule (cells with n_case < 50 are excluded from testing) ----
     MIN_CASES = 50
     a, b = out["cells"].get("ckd"), out["cells"].get("ckd_nf")
     if a and b and "delta_full" in a and "delta_full" in b:
@@ -130,23 +130,23 @@ def stage_run(df):
         ex = b["delta_full"]["ci_excludes_zero"]
         powered = b["n_case"] >= MIN_CASES
         if not powered:
-            v = ("INCONCLUSIVE_POWER：去年龄格 n_case=%d < %d，CI 宽 %.3f ⇒ 不具检验力；"
-                 "只报描述值，不得据以判 H1/H2/H3" % (b["n_case"], MIN_CASES,
+            v = ("INCONCLUSIVE_POWER: age-free cell n_case=%d < %d and CI width %.3f, so the cell has no power; "
+                 "report descriptive values only, without deciding H1/H2/H3" % (b["n_case"], MIN_CASES,
                                                    b["delta_full"]["ci95"][1] - b["delta_full"]["ci95"][0]))
         elif d1 <= 0.5 * D_ORIG and not ex:
-            v = "H1_definition_dominant：定义性贡献≥50%，去年龄标签下增量不显著"
+            v = "H1_definition_dominant: definitional contribution >= 50%, increment not significant under age-free labels"
         elif ex and d1 >= 0.8 * D_ORIG:
-            v = "H2_increment_genuine：优势非定义性 ⇒ 必须降级现稿表述"
+            v = "H2_increment_genuine: the advantage is not definitional, so the current manuscript wording must be downgraded"
         elif ex:
-            v = "H3_partial：定义性占比 = %.0f%%（1 − %.4f/%.4f）" % (100 * (1 - d1 / d0), d1, d0)
+            v = "H3_partial: definitional share = %.0f%% (1 - %.4f/%.4f)" % (100 * (1 - d1 / d0), d1, d0)
         else:
-            v = "灰度：增量不显著但降幅<50%，报告数值不下强结论"
+            v = "grey zone: increment not significant and reduction below 50%; report values without a strong conclusion"
         out["verdict"] = {"rule": v, "powered": powered, "min_cases": MIN_CASES,
                           "delta_orig": d0, "delta_nf": d1,
                           "cidiff_excludes_zero": ex, "prereg_baseline": D_ORIG}
-        print("\n判决:", v)
+        print("\ndecision:", v)
     else:
-        out["verdict"] = {"rule": "INCOMPLETE（缺单元格）"}
+        out["verdict"] = {"rule": "INCOMPLETE (missing cell)"}
     return out
 
 
@@ -160,12 +160,12 @@ def main():
         r = stage_labels(df)
         json.dump(r, open(os.path.join(OUTD, "labels_diagnostic.json"), "w", encoding="utf-8"),
                   ensure_ascii=False, indent=1)
-        print("标签诊断: 全体改变率 %.2f%% | 盲区层 %.2f%% | 盲区病例 %d→%d | %s"
+        print("label diagnostics: overall change %.2f%% | blind stratum %.2f%% | blind cases %d -> %d | %s"
               % (100 * r["chg_all"], 100 * r["chg_blind"], r["blind_n_orig"], r["blind_n_nf"], r["verdict"]))
         for k, v in r["by_age"].items():
             print("   %-6s n=%5d prev %.3f→%.3f chg %.1f%%" % (k, v["n"], v["prev_orig"], v["prev_nf"], 100 * v["chg"]))
         if not r["power_ok"]:
-            print("\n[闸] 盲区改变率<5%% ⇒ 按预注册判 INCONCLUSIVE，停止训练。")
+            print("\n[gate] blind-stratum change rate below 5%%: pre-registered INCONCLUSIVE, training stopped.")
             sys.exit(0)
     if a.stage in ("run", "both"):
         o = stage_run(df)
