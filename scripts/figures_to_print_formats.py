@@ -1,34 +1,34 @@
 # -*- coding: utf-8 -*-
-"""figures_to_print_formats.py —— 由「当前矢量 PDF」派生印刷/上传用格式（可复现、可审计、可移植）
+"""Derive print and upload formats from the current vector PDFs (reproducible, auditable, portable).
 
-为什么需要它：本仓此前**没有** CMYK/EPS/TIFF 的生成脚本 ⇒ 那批件是仓外产物，出现了
-「09-27 矢量集 vs 09-30 主集」的**版本偏斜**（同一图不同措辞）。本脚本把派生链纳入仓库，
-使所有格式都从**同一份矢量 PDF** 生成，版本永远一致。
+Rationale: these formats had no generator in the repository, so the print files were produced outside it and drifted
+from the vector set. This script brings the derivation into the repository so every format
+is generated from the same vector PDF and cannot diverge.
 
-产出（每个 FigureN.pdf）：
-  1) FigureN_CMYK_1200dpi.tif —— 1200 dpi 光栅 + ICC 色彩换算（RGB→CMYK，非朴素反相）
-  2) FigureN_CMYK.pdf        —— 矢量 CMYK（需 ghostscript；本机若缺则**跳过并打印一键命令**，不静默）
-  3) FigureN.eps 由 m6_figure1/m7_figure2/m8_figure3.py 直接产出（matplotlib 矢量后端），本脚本不重复生成。
+Outputs (per FigureN.pdf):
+  1) FigureN_CMYK_1200dpi.tif - 1200 dpi raster with ICC RGB-to-CMYK conversion
+  2) FigureN_CMYK.pdf - vector CMYK via ghostscript; if ghostscript is absent the step is skipped and the exact command printed
+  3) FigureN.eps is produced directly by the figure scripts and is not regenerated here.
 
-可移植性：ICC 与 ghostscript 均按「环境变量 → 标准安装目录（由 SystemRoot/ProgramFiles/ProgramData
-等环境变量推导）→ PATH」的顺序查找，**不写死任何机器专属绝对路径**，便于第三方检出后直接复跑。
+Portability: ICC profile and ghostscript are resolved from environment variables, then standard install roots
+and PATH; no machine-specific absolute path is hard-coded.
 
-用法:
+Usage:
   python figures_to_print_formats.py --dir <figures 目录> [--dpi 1200] [--icc <CMYK profile.icc>]
                                      [--gs <gswin64c 路径>] [--only Figure1,Figure2] [--dry-run]
 
-环境变量（可选）:
-  CKD_CMYK_ICC      指定 ICC 文件；等价于 --icc
-  CKD_GHOSTSCRIPT   指定 ghostscript 可执行文件；等价于 --gs
+Optional environment variables:
+  CKD_CMYK_ICC      ICC file; equivalent to --icc
+  CKD_GHOSTSCRIPT   ghostscript executable; equivalent to --gs
 """
 import os, io, sys, glob, subprocess, argparse, shutil
 
-# 首选 ICC 名（按印前通用度排序）；实际路径由系统色彩目录推导
+# preferred ICC profiles in order of general use; the actual path is derived from the system colour directory
 ICC_PREFERRED = ["CoatedFOGRA39.icc", "USWebCoatedSWOP.icc", "CoatedFOGRA27.icc", "ISOcoated_v2_eci.icc"]
 
 
 def _system_color_dir():
-    """Windows 系统 ICC 目录（由 SystemRoot 推导，不写死盘符）。"""
+    """System ICC directory on Windows, derived from SystemRoot."""
     root = os.environ.get("SystemRoot") or os.environ.get("windir")
     return os.path.join(root, "System32", "spool", "drivers", "color") if root else None
 
@@ -42,16 +42,16 @@ def find_icc(explicit=None):
     d = _system_color_dir()
     if not d or not os.path.isdir(d):
         return None
-    for nm in ICC_PREFERRED:                      # 精确名优先
+    for nm in ICC_PREFERRED:                      # exact names first
         p = os.path.join(d, nm)
         if os.path.isfile(p):
             return p
-    hits = sorted(glob.glob(os.path.join(d, "*.icc")))   # 退路：目录内任一 ICC
+    hits = sorted(glob.glob(os.path.join(d, "*.icc")))   # fallback: any ICC in the directory
     return hits[0] if hits else None
 
 
 def _gs_candidates():
-    """ghostscript 候选路径：环境变量 → PATH → 标准安装目录（全部由环境变量推导）。"""
+    """ghostscript candidates: environment variable, PATH, then standard install roots."""
     out = []
     env = os.environ.get("CKD_GHOSTSCRIPT")
     if env:
@@ -75,10 +75,10 @@ def _gs_candidates():
 
 
 def _find_gs_in_conda_pkgs():
-    """conda 包缓存里可能已有完整 gs（无需安装、不改系统）——按版本号从高到低取第一个可用的。
+    """A complete ghostscript may already exist in a conda package cache; take the highest usable version.
 
-    候选根：sys.prefix、用户家目录下的常见 conda 发行版（miniconda3/anaconda3/miniforge3/mambaforge3）、
-    以及 ProgramData —— 全部由环境变量/家目录推导，不写死盘符或用户名。
+    Candidate roots: sys.prefix, common conda distributions under the home directory,
+    and ProgramData; all derived from environment variables rather than hard-coded drives or usernames.
     """
     bases = []
     for b in (sys.prefix, os.path.dirname(sys.prefix), os.path.expanduser("~"), os.environ.get("ProgramData")):
@@ -118,7 +118,7 @@ def find_gs(explicit=None):
 
 
 def convert_tiff(pdf, out, icc, dpi):
-    """矢量 PDF → 1200 dpi CMYK TIFF（ICC 换算；透明底合成白底）"""
+    """Vector PDF to 1200 dpi CMYK TIFF (ICC conversion; transparency flattened onto white)."""
     import pymupdf
     from PIL import Image, ImageCms
     doc = pymupdf.open(pdf)
@@ -136,7 +136,7 @@ def convert_tiff(pdf, out, icc, dpi):
 
 
 def convert_pdf_cmyk(pdf, out, gs):
-    """矢量 PDF → 矢量 CMYK PDF（ghostscript）"""
+    """Vector PDF to vector CMYK PDF via ghostscript."""
     cmd = [gs, "-dBATCH", "-dNOPAUSE", "-dQUIET", "-sDEVICE=pdfwrite",
            "-dProcessColorModel=/DeviceCMYK", "-sColorConversionStrategy=CMYK",
            "-dEmbedAllFonts=true", "-dSubsetFonts=true", "-dAutoRotatePages=/None",
@@ -162,9 +162,9 @@ if __name__ == "__main__":
     if a.only:
         want = set(x.strip() for x in a.only.split(","))
         pdfs = [p for p in pdfs if os.path.splitext(os.path.basename(p))[0] in want]
-    print(f"[环境] ICC(CMYK) = {icc or '**缺失**（TIFF 将跳过；用 --icc 或 CKD_CMYK_ICC 指定）'}")
-    print(f"[环境] ghostscript = {gs or '**缺失**（CMYK PDF 将跳过）'}")
-    print(f"[目标] {len(pdfs)} 个矢量 PDF @ {a.dpi} dpi\n")
+    print(f"[env] ICC (CMYK) = {icc or '**missing** (TIFF will be skipped; set --icc or CKD_CMYK_ICC)'}")
+    print(f"[env] ghostscript = {gs or '**missing** (CMYK PDF will be skipped)'}")
+    print(f"[目标] {len(pdfs)}  vector PDFs at {a.dpi} dpi\n")
     if a.dry_run:
         for p in pdfs:
             print("  DRY", os.path.basename(p))
@@ -178,12 +178,12 @@ if __name__ == "__main__":
             print(f"  ✅ {os.path.basename(tif):34s} {w}×{h} px | {os.path.getsize(tif)/1e6:6.2f} MB")
             ok += 1
         else:
-            print("  ⚠ 跳过 TIFF：找不到 CMYK ICC profile（用 --icc 指定）")
+            print("  skipping TIFF: no CMYK ICC profile found (pass --icc)")
         if gs:
             rc, msg = convert_pdf_cmyk(p, base + "_CMYK.pdf", gs)
             print(("  ✅ " if rc == 0 else "  ❌ ") + f"{os.path.basename(base)}_CMYK.pdf  gs exit={rc} {msg if rc else ''}")
         else:
-            print(f"  ⏭ 跳过 CMYK PDF（缺 ghostscript）→ 有 gs 时执行：")
+            print(f"  skipping CMYK PDF (no ghostscript); run this when gs is available:")
             print(f"      gswin64c -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -dProcessColorModel=/DeviceCMYK \\")
             print(f"               -sColorConversionStrategy=CMYK -sOutputFile=\"{os.path.basename(base)}_CMYK.pdf\" \"{os.path.basename(p)}\"")
-    print(f"\n完成：TIFF {ok}/{len(pdfs)}")
+    print(f"\ndone: TIFF {ok}/{len(pdfs)}")

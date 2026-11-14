@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""阶段 A · Wave 2 · ML 批：
-P1-13 本稿自带归因（用公开仓 models/ 导出的 XGBoost + pred_contribs=SHAP）
-P1-14 特征阶梯（1→3→5→8→12→12+指示列）含 ΔAUC CI
-P1-15 极端缺失扰动（全缺/50%随机缺/单变量剔除）
-自检：导出模型在 test 上 AUC 必须 = 0.8099（±1e-4），否则中止
-输出：results/p1_ml.json（+ figures/fig_shap.pdf 可选）
+"""Stage A, wave 2: machine-learning analyses.
+P1-13 in-repository attribution using the exported XGBoost model (pred_contribs = SHAP)
+P1-14 feature ladder (1, 3, 5, 8, 12, and 12 plus missingness flags) with delta-AUC confidence intervals
+P1-15 extreme-missingness perturbation (all missing, 50% missing at random, single-feature ablation)
+Self-check: the exported model must reach AUC 0.8099 (+/-1e-4) on the test set; otherwise abort.
+Output: results/p1_ml.json (optionally figures/fig_shap.pdf).
 """
 import json, os, sys, time
 import numpy as np, pandas as pd
@@ -32,12 +32,12 @@ Xtr, Xte = f(enc(train[FEATURES])), f(enc(test[FEATURES]))
 ytr, yte = train["ckd"].values, test["ckd"].values
 out = {}
 
-# ---------- P1-13 用公开仓导出模型做归因（SHAP） ----------
-print("P1-13 归因（导出模型 + pred_contribs）...", flush=True)
+# ---------- P1-13 attribution with the exported model (SHAP) ----------
+print("P1-13 attribution (exported model, pred_contribs) ...", flush=True)
 mp = os.path.join(REPO, "models", "xgb_model.json")
 pp = os.path.join(REPO, "models", "preprocessing.json")
 if not (os.path.exists(mp) and os.path.exists(pp)):
-    out["shap"] = {"note": "导出模型或预处理文件缺失，无法用已发布产物做归因"}
+    out["shap"] = {"note": "exported model or preprocessing file missing; cannot attribute with the published artifacts"}
 else:
     ppj = json.load(open(pp, encoding="utf-8"))
     cols = ppj.get("columns") or ppj.get("feature_order") or ppj.get("final_columns")
@@ -45,12 +45,12 @@ else:
     Xuse = Xte[cols] if cols else Xte
     p_export = booster.predict_proba(Xuse.astype(float))[:, 1]
     a_exp = roc_auc_score(yte, p_export)
-    print(f"   导出模型 AUC={a_exp:.4f}（目标 0.8099）", flush=True)
+    print(f"   exported model AUC={a_exp:.4f}(target 0.8099)", flush=True)
     if abs(a_exp - 0.8099) > 1e-4:
-        out["shap"] = {"note": "导出模型自检未通过，不报告归因", "auc_export": round(a_exp, 4)}
+        out["shap"] = {"note": "exported-model self-check failed; attribution not reported", "auc_export": round(a_exp, 4)}
     else:
         dm = DMatrix(Xuse, feature_names=list(Xuse.columns))
-        contribs = booster.get_booster().predict(dm, pred_contribs=True)   # 末列为 bias
+        contribs = booster.get_booster().predict(dm, pred_contribs=True)   # last column is the bias term
         vals = contribs[:, :-1]
         mean_abs = np.abs(vals).mean(axis=0)
         idx = np.argsort(-mean_abs)[:8]
@@ -60,7 +60,7 @@ else:
                        "n_features": int(len(Xuse.columns))}
         print("   Top-5:", [(d["feature"], d["mean_abs_shap"]) for d in out["shap"]["top_features"][:5]], flush=True)
         json.dump({"note": "P1 ML addendum (partial)", "results": out}, open(os.path.join(RES, "p1_ml.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=2)
-        # 顺手出一张矢量图（仓内用，不进 SI 排版）
+        # optional vector figure for repository use (not part of the supplement layout)
         try:
             import matplotlib
             matplotlib.use("Agg")
@@ -74,12 +74,12 @@ else:
             fp = os.path.join(fdir, "fig_shap_attribution.pdf")
             fig.tight_layout(); fig.savefig(fp, format="pdf"); plt.close(fig)
             out["shap"]["figure"] = "figures/fig_shap_attribution.pdf"
-            print("   图已出:", fp, flush=True)
+            print("   figure written:", fp, flush=True)
         except Exception as e:
-            print("   出图跳过:", e, flush=True)
+            print("   figure skipped:", e, flush=True)
 
-# ---------- P1-14 特征阶梯 ----------
-print("P1-14 特征阶梯 ...", flush=True)
+# ---------- P1-14 feature ladder ----------
+print("P1-14 feature ladder ...", flush=True)
 XGBP = dict(n_estimators=300, max_depth=4, learning_rate=0.05, subsample=0.8, colsample_bytree=0.8,
             eval_metric="logloss", n_jobs=4, random_state=42)
 LADDER = [("age only", ["age"]), ("3 variables (age, diabetes, SBP)", ["age", "diabetes", "sbp"]),
@@ -89,7 +89,7 @@ LADDER = [("age only", ["age"]), ("3 variables (age, diabetes, SBP)", ["age", "d
           ("12 variables + missingness indicators (primary model)", list(Xtr.columns))]
 rng = np.random.default_rng(RNG); out["feature_ladder"] = {"items": []}
 full = XGBClassifier(**XGBP).fit(Xtr, ytr); p_full = full.predict_proba(Xte)[:, 1]
-a_full = roc_auc_score(yte, p_full); print(f"   全模型 AUC={a_full:.4f}", flush=True)
+a_full = roc_auc_score(yte, p_full); print(f"   full model AUC={a_full:.4f}", flush=True)
 for tag, cols in LADDER:
     m = XGBClassifier(**XGBP).fit(Xtr[cols], ytr); p = m.predict_proba(Xte[cols])[:, 1]
     a = roc_auc_score(yte, p)
@@ -103,8 +103,8 @@ for tag, cols in LADDER:
     print(f"   {tag:<52} AUC={a:.4f} Δ={a - a_full:+.4f}", flush=True)
     json.dump({"note": "P1 ML addendum (partial)", "results": out}, open(os.path.join(RES, "p1_ml.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 
-# ---------- P1-15 极端缺失扰动 ----------
-print("P1-15 极端缺失扰动 ...", flush=True)
+# ---------- P1-15 extreme-missingness perturbation ----------
+print("P1-15 extreme-missingness perturbation ...", flush=True)
 def score(Xq):
     return roc_auc_score(yte, full.predict_proba(Xq[list(Xtr.columns)].astype(float))[:, 1])
 base = score(Xte)
@@ -116,7 +116,7 @@ a_all = score(Xall)
 rng2 = np.random.default_rng(RNG); X50 = Xte.copy()
 mask = rng2.random(X50.shape) < 0.5
 X50 = X50.mask(mask).astype(float)
-# 被掩掉的缺失指示列与真实缺失不同（这里模拟"输入不可得"的最坏情形）
+# masked missingness flags differ from true missingness: this simulates the worst case of unavailable inputs
 a_half = score(X50)
 single = {}
 for c in clin:
@@ -126,9 +126,9 @@ for c in clin:
 out["missingness_perturbation"] = {"baseline_auc": round(float(base), 4), "all_clinical_inputs_missing_auc": round(float(a_all), 4),
                                    "random_50pct_cells_missing_auc": round(float(a_half), 4),
                                    "single_feature_ablation_delta_auc": dict(sorted(single.items(), key=lambda kv: -kv[1]))}
-print("   全缺 AUC=", round(a_all, 4), "| 50% 随机缺 AUC=", round(a_half, 4), flush=True)
-print("   单变量剔除 ΔAUC 最大三项:", list(out["missingness_perturbation"]["single_feature_ablation_delta_auc"].items())[:3], flush=True)
+print("   all-missing AUC=", round(a_all, 4), "| 50% missing-at-random AUC=", round(a_half, 4), flush=True)
+print("   largest single-feature delta AUC:", list(out["missingness_perturbation"]["single_feature_ablation_delta_auc"].items())[:3], flush=True)
 
 json.dump({"note": "P1 machine-learning addendum (expert-panel items A-phase)", "results": out},
           open(os.path.join(RES, "p1_ml.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=2)
-print("✅ p1_ml.json 已写（用时 %.0fs）" % (time.time() - t0), flush=True)
+print("✅ p1_ml.json written (elapsed %.0fs）" % (time.time() - t0), flush=True)

@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
-"""m17_transport_ladder.py — A3：迁移-校准阶梯（held-out）+ 本地样本量经验规则（2026-10-04）
+"""m17_transport_ladder.py - transport/calibration ladder (held-out) and local sample-size rules.
 
-动机（对应期刊适配风险与学理增量）：
-  · 旧记录的 "recalibration_sensitivity" 是 **calibration-only 模拟**（用了目标体系患病率），
-    自述"NOT a validation result" ⇒ 不能作为迁移结论。
-  · 本脚本改为 **K 折交叉的 held-out 阶梯**：在每折的校准子集上拟合校正，在留出子集上评估。
-  · 并输出 **经验样本量规则**：在新体系要拿到可控的 ECE 与 C-index 精度，需要多少人/事件。
+Motivation:
+  - The earlier "recalibration_sensitivity" block was a calibration-only simulation that used target prevalence,
+    and was explicitly labelled "NOT a validation result"; it cannot support a transportability claim.
+  - This script uses a K-fold held-out ladder: corrections are fitted on the calibration subset of each fold and evaluated on the held-out subset.
+  - It also derives an empirical sample-size rule for a new system to reach a target ECE and C-index precision.
 
-阶梯（每折均在 held-out 评估）：
-  rung0 = 不校正
-  rung1 = 仅截距重校准（calibration-in-the-large；解析求解）
-  rung2 = 斜率+截距重校准（logistic recalibration on logit(p)）
-  rung3 = 本地重开发（在目标体系协变量上重拟合 logistic）
+Ladder (every rung evaluated held-out):
+  rung0 = no correction
+  rung1 = intercept-only recalibration (calibration-in-the-large, closed form)
+  rung2 = slope and intercept recalibration (logistic recalibration on logit(p))
+  rung3 = local redevelopment (logistic refit on target-system covariates)
 
-口径纪律：沿用 knh_multiwave_cross_system.py 的冻结 race-blind 模型与协调化；
-双自检门（含 race=0.8099 / race-blind=0.8065）不过则中止，避免流程漂移。
-输出：results/m2/m17_transport_ladder.json
-运行：python scripts/m17_transport_ladder.py
+Definitions follow the frozen race-blind model and harmonisation in knh_multiwave_cross_system.py.
+Both self-check gates (with race 0.8099, race-blind 0.8065) must pass; otherwise the run aborts.
+Output: results/m2/m17_transport_ladder.json
+Run: python scripts/m17_transport_ladder.py
 """
 import os, sys, json, time
 import numpy as np
@@ -28,10 +28,10 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.linear_model import LogisticRegression
 
 PROJ = os.environ.get("CKD_PIPELINE_BASE") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-REPO = PROJ                      # 包内布局：knh 模块与 m17 同在 <pkg>/scripts
+REPO = PROJ                      # package layout: the knh modules sit beside m17 in scripts/
 sys.path.insert(0, os.path.join(REPO, "scripts"))
-import knh2022_cross_system as M                      # noqa: E402  (提供 PROJ/HYP/load_nhanes)
-import knh_multiwave_cross_system as MW               # noqa: E402  (提供 load_year/RB/自检门)
+import knh2022_cross_system as M                      # noqa: E402  (provides PROJ/HYP/load_nhanes)
+import knh_multiwave_cross_system as MW               # noqa: E402  (provides load_year/RB and the self-check gate)
 
 OUT = os.path.join(PROJ, "results", "m2", "m17_transport_ladder.json")
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
@@ -43,7 +43,7 @@ NREP = 200
 
 
 def drb(X):
-    """race-blind 口径（与 knh_multiwave_cross_system.main 内一致）：female 哑变量 + drop sex"""
+    """Race-blind variant (identical to knh_multiwave_cross_system.main): female dummy, sex dropped."""
     X = X.copy()
     X["female"] = (X["sex"] == 2).astype(float)
     return X.drop(columns=["sex"])
@@ -64,7 +64,7 @@ def ece(p, y, bins=10):
 
 
 def fit_intercept(p, y):
-    """仅截距重校准：解 Σ σ(logit(p)+a) = Σ y"""
+    """Intercept-only recalibration: solve sum(sigmoid(logit(p)+a)) = sum(y)."""
     lo = logit(p)
     f = lambda a: expit(lo + a).sum() - np.sum(y)
     return float(brentq(f, -30, 30))
@@ -97,7 +97,7 @@ def main():
         "folds": K, "seed": SEED, "sample_size_grid": list(NGRID), "reps_per_size": NREP,
         "run_at": time.strftime("%Y-%m-%d %H:%M:%S")}}
 
-    # ---- 自检门（复用既有冻结值，防流程漂移）----
+    # ---- self-check gate (reuses the frozen values) ----
     dev = pd.concat([M.load_nhanes(c) for c in ("G", "H", "I")], ignore_index=True)
     val = M.load_nhanes("J")
     d_rb, v_rb = drb(dev[RB]), drb(val[RB])
@@ -108,11 +108,11 @@ def main():
     auc_ck = float(roc_auc_score(val["ckd"].values, m.predict_proba(F(v_rb))[:, 1]))
     res["self_check"] = {"race_blind_temporal_auc": round(auc_ck, 4), "expected": 0.8065,
                          "passed": abs(auc_ck - 0.8065) <= 1e-4}
-    print(f"[自检门] race-blind 时间外 AUC={auc_ck:.4f} (期望 0.8065) {'✅' if res['self_check']['passed'] else '❌'}")
+    print(f"[self-check] race-blind temporal AUC={auc_ck:.4f} (expected 0.8065) {'✅' if res['self_check']['passed'] else '❌'}")
     if not res["self_check"]["passed"]:
-        sys.exit("❌ 自检门未过，中止")
+        sys.exit("self-check gate failed; aborting")
 
-    # ---- 目标体系（KNHANES 三波合并）+ 协调化 ----
+    # ---- target system (KNHANES, three waves pooled) and harmonisation ----
     pir = dev["poverty_ratio"].dropna()
     qs = pir.quantile([0, .2, .4, .6, .8, 1.0]).values
     means = [pir[(pir >= qs[i]) & (pir <= qs[i + 1])].mean() for i in range(5)]
@@ -131,9 +131,9 @@ def main():
                             "ckd_pct": round(100 * float(y_all.mean()), 2),
                             "auc_frozen": round(float(roc_auc_score(y_all, p_all)), 4),
                             "ece_raw": round(ece(p_all, y_all), 4)}
-    print(f"[目标体系] n={len(D)} CKD={int(y_all.sum())} AUC(冻结)={res['target_cohort']['auc_frozen']} ECE={res['target_cohort']['ece_raw']}")
+    print(f"[target] n={len(D)} CKD={int(y_all.sum())} AUC(冻结)={res['target_cohort']['auc_frozen']} ECE={res['target_cohort']['ece_raw']}")
 
-    # ---- A3-1 held-out 阶梯（K 折交叉）----
+    # ---- A3-1 held-out ladder (K-fold) ----
     skf = StratifiedKFold(K, shuffle=True, random_state=SEED)
     rows = {r: [] for r in ("rung0_none", "rung1_intercept", "rung2_slope_intercept", "rung3_local_refit")}
     for tr, te in skf.split(p_all.reshape(-1, 1), y_all):
@@ -162,9 +162,9 @@ def main():
         ladder[k] = {m_: round(float(np.mean([r[m_] for r in lst])), 4) for m_ in ("ece", "auc", "mean_pred", "obs")}
         ladder[k]["ece_sd"] = round(float(np.std([r["ece"] for r in lst])), 4)
     res["held_out_ladder"] = ladder
-    print("[阶梯]", json.dumps(ladder, ensure_ascii=False))
+    print("[ladder]", json.dumps(ladder, ensure_ascii=False))
 
-    # ---- A3-2 经验样本量规则：ECE 与 AUC 精度随 n 的变化 ----
+    # ---- A3-2 empirical sample-size rule: ECE and AUC precision as a function of n ----
     rng = np.random.default_rng(SEED)
     idx_all = np.arange(len(y_all))
     curve = []
@@ -192,17 +192,17 @@ def main():
                       "held_out_auc_iqr_width": round(float(np.percentile(aucs, 75) - np.percentile(aucs, 25)), 4),
                       "held_out_auc_p025": round(float(np.percentile(aucs, 2.5)), 4),
                       "held_out_auc_p975": round(float(np.percentile(aucs, 97.5)), 4)})
-        print(f"  n={n:5d} events≈{curve[-1]['events_calib_median']:4d} → held-out ECE 中位 {curve[-1]['held_out_ece_median']:.4f} "
-              f"(P90 {curve[-1]['held_out_ece_p90']:.4f}) | AUC 95%区间宽 {curve[-1]['held_out_auc_p975']-curve[-1]['held_out_auc_p025']:.4f}")
+        print(f"  n={n:5d} events≈{curve[-1]['events_calib_median']:4d} -> held-out median ECE {curve[-1]['held_out_ece_median']:.4f} "
+              f"(P90 {curve[-1]['held_out_ece_p90']:.4f}) | AUC 95% interval width {curve[-1]['held_out_auc_p975']-curve[-1]['held_out_auc_p025']:.4f}")
     res["sample_size_curve"] = curve
-    # 最小 n 估计：满足 held-out ECE 中位 ≤ 0.02 且 AUC 95% 区间宽 ≤ 0.05
+    # smallest n meeting median held-out ECE <= 0.02 and AUC 95% interval width <= 0.05
     def minimal(pred):
         hit = [c for c in curve if pred(c)]
         return hit[0] if hit else None
     res["rules"] = {
         "ECE_median_le_0.02": minimal(lambda c: c["held_out_ece_median"] <= 0.02),
         "AUC_ciwidth_le_0.05": minimal(lambda c: (c["held_out_auc_p975"] - c["held_out_auc_p025"]) <= 0.05),
-        "note": "n_calib = 目标体系可用于本地重校准的个体数（事件数为其经验中位）；held-out 评估用其余个体。",
+        "note": "n_calib is the number of target-system individuals available for local recalibration (events = empirical median); the remainder is used for held-out evaluation.",
     }
     res["elapsed_sec"] = round(time.time() - t0, 1)
     json.dump(res, open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=1, default=str)

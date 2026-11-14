@@ -1,38 +1,38 @@
 # -*- coding: utf-8 -*-
-"""rerun_all.py — 一条命令全量重跑（A5 可复现层级）。
+"""rerun_all.py - rerun the whole pipeline with one command.
 
-设计原则：
-  · 只跑**真实**的既有分析脚本，不重实现口径；任一阶段失败即记录并继续（末尾汇总）。
-  · 运行前后不修改任何脚本；数据已在 data/ 时跳过下载。
-  · 产出 results/_rerun_log_<ts>.json：逐阶段 exit code / 耗时 / 关键输出行数。
+Design:
+  - Runs the real analysis scripts without re-implementing any definition; a failing stage is recorded and the run continues.
+  - No script is modified at run time; downloads are skipped when data/ is already present.
+  - Produces results/_rerun_log_<ts>.json with exit code, elapsed time and key output counts per stage.
   · --check：compare every registered key value against the recomputed result (reproducibility evidence).
 
-用法：
-  python scripts/rerun_all.py                 # 全量
+Usage:
+  python scripts/rerun_all.py                 # full run
   python scripts/rerun_all.py --stages m16 m17
-  python scripts/rerun_all.py --check         # 全量 + 值级比对
-运行环境：python（含 pandas/lifelines/pyreadstat/xgboost）
+  python scripts/rerun_all.py --check         # full run + 值级比对
+Runtime: python with pandas, lifelines, pyreadstat and xgboost.
 """
 import argparse, json, os, subprocess, sys, time
 
 PROJ = os.environ.get("CKD_PIPELINE_BASE") or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 SCRIPTS = os.path.join(PROJ, "scripts")
-REPO_SCRIPTS = os.path.join(PROJ, "scripts")   # 包内布局：与 SCRIPTS 同目录
+REPO_SCRIPTS = os.path.join(PROJ, "scripts")   # package layout: same directory as SCRIPTS
 
 STAGES = [
-    ("cohort",  os.path.join(SCRIPTS, "build_cohort.py"),           "队列构建（含标签/权重）"),
-    ("model",   os.path.join(SCRIPTS, "modeling.py"),               "三模型 + 时间外验证"),
-    ("supp",    os.path.join(SCRIPTS, "supplementary_analysis.py"), "bootstrap/校准/DCA/亚组"),
-    ("m16",     os.path.join(SCRIPTS, "m16_mortality_a2.py"),       "A2 联动死亡预后验证"),
-    ("m17",     os.path.join(SCRIPTS, "m17_transport_ladder.py"),   "A3 迁移-校准阶梯 + 样本量规则"),
-    ("knh22",   os.path.join(REPO_SCRIPTS, "knh2022_cross_system.py"),        "跨体系（2022 单波）"),
-    ("knh_mw",  os.path.join(REPO_SCRIPTS, "knh_multiwave_cross_system.py"),  "跨体系（三波）"),
-    ("labelmanip", os.path.join(REPO_SCRIPTS, "label_manipulation_sensitivity.py"), "标签操纵敏感性（2×2，年龄项归因）"),
-    ("ciboot",   os.path.join(REPO_SCRIPTS, "ci_bootstrap_3items.py"),           "死亡 C-index 及配对 bootstrap CI"),
+    ("cohort",  os.path.join(SCRIPTS, "build_cohort.py"),           "cohort build (labels and weights)"),
+    ("model",   os.path.join(SCRIPTS, "modeling.py"),               "three models and temporal validation"),
+    ("supp",    os.path.join(SCRIPTS, "supplementary_analysis.py"), "bootstrap, calibration, DCA, subgroups"),
+    ("m16",     os.path.join(SCRIPTS, "m16_mortality_a2.py"),       "mortality-linkage prognostic validation"),
+    ("m17",     os.path.join(SCRIPTS, "m17_transport_ladder.py"),   "transport/calibration ladder and sample-size rule"),
+    ("knh22",   os.path.join(REPO_SCRIPTS, "knh2022_cross_system.py"),        "cross-system, 2022 wave"),
+    ("knh_mw",  os.path.join(REPO_SCRIPTS, "knh_multiwave_cross_system.py"),  "cross-system, three waves"),
+    ("labelmanip", os.path.join(REPO_SCRIPTS, "label_manipulation_sensitivity.py"), "label-manipulation sensitivity (2x2, age-term attribution)"),
+    ("ciboot",   os.path.join(REPO_SCRIPTS, "ci_bootstrap_3items.py"),           "mortality C-index with paired bootstrap CI"),
 ]
 
-# --check 用的登记值 → 重算来源（真源 JSON 的相对路径 + 取值路径）
+# --check: registered values mapped to their source JSON and key path
 CHECKS = [
     ("XGB_AUC_EXT",       "model_results.json",                    ["XGB", "auc_test"]),
     ("KNH_AUC",           "knh2022_cross_system.json",             ["auc", "value"]),
@@ -57,20 +57,20 @@ def dig(obj, path):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--stages", nargs="*", default=None, help="只跑指定阶段（默认全量）")
-    ap.add_argument("--check", action="store_true", help="跑完做值级复现比对")
+    ap.add_argument("--stages", nargs="*", default=None, help="run only the listed stages (default: all)")
+    ap.add_argument("--check", action="store_true", help="compare recomputed values against the registry after the run")
     a = ap.parse_args()
 
-    # 数据在场检查
+    # check that the input data are present
     data_ok = os.path.isdir(os.path.join(PROJ, "data")) and len(os.listdir(os.path.join(PROJ, "data"))) > 0
     knh_ok = os.path.isdir(os.path.join(PROJ, "data", "knh"))
-    print(f"[env] python={PY}\n[env] data/ 在场={data_ok}  data/knh/ 在场={knh_ok}")
+    print(f"[env] python={PY}\n[env] data/ present={data_ok}  data/knh/ 在场={knh_ok}")
 
     to_run = [s for s in STAGES if (not a.stages) or (s[0] in a.stages)]
     log = {"started": time.strftime("%Y-%m-%d %H:%M:%S"), "python": PY,
            "stages": [], "before": {}, "after": {}}
 
-    # 记录关键结果文件的运行前哈希（便于判定是否真的重算）
+    # record pre-run hashes of key result files to prove they were actually recomputed
     import hashlib
     def h(p):
         try:
@@ -83,8 +83,8 @@ def main():
 
     for name, script, desc in to_run:
         if not os.path.exists(script):
-            log["stages"].append({"stage": name, "ok": False, "error": "脚本不存在", "path": script})
-            print(f"  ⚠️ {name}: 脚本不存在 {script}")
+            log["stages"].append({"stage": name, "ok": False, "error": "script not found", "path": script})
+            print(f"  ⚠️ {name}: script not found: {script}")
             continue
         t0 = time.time()
         r = subprocess.run([PY, script], cwd=PROJ,
@@ -110,7 +110,7 @@ def main():
             try:
                 v = dig(json.load(open(p, encoding="utf-8")), path)
             except Exception as e:
-                v = f"读取失败: {type(e).__name__}"
+                v = f"read failed: {type(e).__name__}"
             checks.append({"claim": cid, "source": rel, "value": v})
             print(f"  {cid:20s} = {v}   ({rel})")
         log["checks"] = checks
@@ -118,7 +118,7 @@ def main():
     outp = os.path.join(PROJ, "results", f"_rerun_log_{time.strftime('%Y%m%d_%H%M%S')}.json")
     json.dump(log, open(outp, "w", encoding="utf-8"), ensure_ascii=False, indent=1, default=str)
     okn = sum(1 for s in log["stages"] if s.get("ok"))
-    print(f"\n阶段通过 {okn}/{len(log['stages'])}  | 日志: {outp}")
+    print(f"\nstages passed {okn}/{len(log['stages'])}  | log: {outp}")
 
 
 if __name__ == "__main__":
