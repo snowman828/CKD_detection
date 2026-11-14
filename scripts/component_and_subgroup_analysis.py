@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""分量 AUC 与亚组校准（投稿前审计补强分析；对应审计报告 M4/M5）
+"""Component AUC and subgroup calibration (supporting analysis)
 
 输出 `results/component_subgroup_results.json`，供 SI Table S4 引用。
 - 分量 AUC：模型分数对 (a) eGFR<60（仅 eGFR 可测者）与 (b) uACR≥30（仅 uACR 可测者）分别求 AUC

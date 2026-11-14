@@ -1,4 +1,4 @@
-"""M6 Figure 1 —— 子研究① 足迹探针主图（投稿级数据图）
+"""M6 Figure 1 - footprint probe for sub-study 1 (publication-quality figure)
 a) 特征 SHAP 重要性条形图（Top 10，按 CKM 通路配色）
 b) SHAP 作用模式聚类热图：特征×特征 |SHAP 相关| + Ward 树状图 + CKM 通路色带 + ARI 标注
 输出：300dpi PNG + PDF 矢量（Nature 单栏宽度）

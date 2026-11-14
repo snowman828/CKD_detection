@@ -151,7 +151,7 @@ p = model.predict_proba(encode(df))[:, 1]            # encode() snippet in model
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `export_models.py` exits `❌ 缺少必需输入` (exit 1) | `results/cohort.parquet` or `results/model_results.json` absent | Run §2b steps 1–3 first |
+| `export_models.py` exits `required inputs are missing` (exit 1) | `results/cohort.parquet` or `results/model_results.json` absent | Run §2b steps 1–3 first |
 | `build_cohort.py` fails on cycle H | H (2013–2014) files not in `download_nhanes.py` | Download H files manually from the CDC NHANES 2013–2014 page (URL in §2b step 1) |
 | `No module named 'pyreadstat'` | KNHANES scripts require `pyreadstat`, listed under "optional" in `requirements.txt` | `pip install pyreadstat` |
 | `No module named 'lifelines'` | `cox_s5b.py` / `check_nns.py` need `lifelines` | `pip install lifelines==0.30.3` (already in requirements.txt) |

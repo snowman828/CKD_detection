@@ -27,7 +27,7 @@ _REQUIRED = [os.path.join(RES, "cohort.parquet"), os.path.join(RES, "model_resul
 _missing = [p for p in _REQUIRED if not os.path.exists(p)]
 if _missing:
     import sys as _sys
-    print("❌ export_models.py 缺少必需输入（gitignored 中间产物，不随 GitHub 分发）：")
+    print("❌ export_models.py required inputs are missing（gitignored 中间产物，不随 GitHub 分发）：")
     for p in _missing:
         print(f"   - {os.path.basename(p)}")
     print("  这些由公开 NHANES 数据重建（见 README “Track 2 — full pipeline”）：")

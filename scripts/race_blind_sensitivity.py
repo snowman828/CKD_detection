@@ -5,7 +5,7 @@
 本脚本真重训两种变体并给 bootstrap CI：
   (A) 完整模型（含 race_black/hisp/other）—— 自检须复现 0.8099
   (B) race-blind（去 3 个 race 指示列，保留 female）
-另报单列消融（已存在于 p1_ml.json，此处仅复核）。
+Single-column ablations are reported in p1_ml.json and only re-checked here.
 
 输出：results/race_blind_sensitivity.json
 """
@@ -100,7 +100,7 @@ def main():
     ok = abs(aucA - 0.8099) <= 1e-4
     print("    自检门 AUC==0.8099 ? %s" % ("✅" if ok else "❌ 漂移 → 中止"))
     if not ok:
-        sys.exit("❌ 自检门未过，拒绝写入结果（避免污染台账）")
+        sys.exit("self-check failed; refusing to write results")
     res["full_model"] = {"auc": round(aucA, 4), "ci": [round(loA, 4), round(hiA, 4)],
                          "n_features_matrix": int(Xtr.shape[1]), "n_test": int(len(y)),
                          "events_test": int(y.sum())}
@@ -128,7 +128,7 @@ def main():
     res["delta_auc_race_blind_minus_full"] = {"value": round(d, 4),
                                               "ci": [round(dlo, 4), round(dhi, 4)]}
 
-    # 单列消融复核（与 p1_ml.json 对账）
+    # single-column ablation re-check against p1_ml.json
     _repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     _cand = [os.path.join(_repo, "results", "p1_ml.json"),
              os.path.join(os.path.dirname(os.path.abspath(a.out)), "p1_ml.json")]

@@ -261,7 +261,7 @@ for ev in ("mort", "cvd"):
 
 # ---------- 功效/披露 ----------
 res["disclosures"] = {
-    "post_hoc": "该分析不在预注册方案内，属投稿后探索性分析",
+    "post_hoc": "not part of the pre-specified protocol; exploratory analysis",
     "power": "开发期联动样本人-年与事件数见各条目；时间外验证集事件数少（见 n_test_events），结论标为探索性",
     "ph_assumption": "对 CKD 标签模型做了比例风险检验（rank 变换），结果见 Q1_*_ph_test_p",
     "no_causal_claim": "本分析仅报告关联，不声称因果；不作为部署或替代肾脏化验的依据",

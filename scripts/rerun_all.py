@@ -5,7 +5,7 @@
   · 只跑**真实**的既有分析脚本，不重实现口径；任一阶段失败即记录并继续（末尾汇总）。
   · 运行前后不修改任何脚本；数据已在 data/ 时跳过下载。
   · 产出 results/_rerun_log_<ts>.json：逐阶段 exit code / 耗时 / 关键输出行数。
-  · --check：跑完后把**台账已登记的关键值**与重算结果逐一比对（复现性证据）。
+  · --check：compare every registered key value against the recomputed result (reproducibility evidence).
 
 用法：
   python scripts/rerun_all.py                 # 全量
@@ -103,7 +103,7 @@ def main():
         log["after"][rel] = h(p)
 
     if a.check:
-        print("\n=== 值级复现比对（台账登记值 ⇄ 重算结果）===")
+        print("\n=== value-level reproduction check (registered vs recomputed) ===")
         checks = []
         for cid, rel, path in CHECKS:
             p = os.path.join(PROJ, "results", rel.replace("/", os.sep))

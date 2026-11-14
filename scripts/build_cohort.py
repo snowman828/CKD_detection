@@ -9,7 +9,7 @@ DATA = r"data"
 OUT  = r"results"
 os.makedirs(OUT, exist_ok=True)
 
-CYCLES = {"G": 2011, "H": 2013, "I": 2015, "J": 2017}   # H=2013-2014（审稿修复：消除 cherry-picking 质疑）
+CYCLES = {"G": 2011, "H": 2013, "I": 2015, "J": 2017}   # H = 2013-2014 (included so that cycle choice cannot be read as cherry-picking)
 
 def load(fname):
     p = os.path.join(DATA, fname + ".XPT")
@@ -82,7 +82,7 @@ cohort["ckd"] = ((cohort["egfr"] < 60) | (cohort["uacr"] >= 30)).astype(float)
 cohort["ckd_g3plus"] = (cohort["egfr"] < 60).astype(float)
 cohort["albuminuria"] = (cohort["uacr"] >= 30).astype(float)
 cohort["diabetes"] = np.where(cohort["diabetes_q"] == 1, 1.0,
-                              np.where(cohort["diabetes_q"] == 2, 0.0, np.nan))  # 缺失保留 NaN → 插补层处理（审稿 P1-6）
+                              np.where(cohort["diabetes_q"] == 2, 0.0, np.nan))  # missing values stay as NaN and are handled by the imputation layer
 cohort["nadkd_candidate"] = ((cohort["diabetes"] == 1) & (cohort["egfr"] < 60) & (cohort["uacr"] < 30)).astype(float)
 
 # --- 排除 ---

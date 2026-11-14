@@ -1,6 +1,6 @@
-"""生成投稿补充材料（Supplementary Information）S1-S3 + 方法补充（全部真实数据）
+"""Generate the Supplementary Information (S1-S3) and method notes from the committed results
 S1 基准分解表（含 CI）| S2 完整模型指标 | S3 特征缺失率 | 方法补充
-输出: 论文/投稿材料/SupplementaryInformation.md → docx
+Output: build/supplementary/SupplementaryInformation.md -> docx
 """
 import pandas as pd, numpy as np, json, os
 from sklearn.metrics import roc_auc_score
@@ -8,7 +8,8 @@ from sklearn.linear_model import LogisticRegression
 from xgboost import XGBClassifier
 
 OUT = r"results"
-DOC = r"论文/投稿材料"
+DOC = os.path.join("build", "supplementary")
+os.makedirs(DOC, exist_ok=True)
 
 cohort = pd.read_parquet(os.path.join(OUT, "cohort.parquet"))
 test = pd.read_parquet(os.path.join(OUT, "test_set.parquet"))

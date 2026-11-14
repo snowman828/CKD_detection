@@ -168,7 +168,7 @@ print("   模型每 1,000 人：检出", o_base["tp_per1000"], "假阳", o_base[
 # ---------- P1-09 1,233 例不可评估者画像 ----------
 print("P1-09 1,233 画像 ...", flush=True)
 both = cohort["egfr"].isna() & cohort["uacr"].isna()
-print(f"   两标志均缺: {int(both.sum())}（台账 1,233）", flush=True)
+print(f"   两标志均缺: {int(both.sum())}(expected 1,233)", flush=True)
 if int(both.sum()) != 1233:
     sys.exit(f"❌ 自检失败：两标志均缺 {int(both.sum())} != 1233")
 def prof(mask):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """knh2022_cross_system.py — 阶段 C：KNHANES 2022 跨医疗体系外部验证（冻结模型 + race-blind 预指定口径）
 
-设计（全部显式、可复核）：
+Design (fully explicit and re-checkable):
   1) 自检门：用 NHANES 2011–2016 开发集重训 XGBoost → 必须在 2017–2018 复现 AUC=0.8099（±1e-4），否则中止。
   2) 预指定口径：跨体系应用走 **race-blind** 变体（去 race 三个指示列及其缺失指示列 → 22 输入）。
   3) 协调化（各国量表不同，全部显式声明）：
