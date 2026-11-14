@@ -29,6 +29,7 @@ STAGES = [
     ("knh22",   os.path.join(REPO_SCRIPTS, "knh2022_cross_system.py"),        "跨体系（2022 单波）"),
     ("knh_mw",  os.path.join(REPO_SCRIPTS, "knh_multiwave_cross_system.py"),  "跨体系（三波）"),
     ("labelmanip", os.path.join(REPO_SCRIPTS, "label_manipulation_sensitivity.py"), "标签操纵敏感性（2×2，年龄项归因）"),
+    ("ciboot",   os.path.join(REPO_SCRIPTS, "ci_bootstrap_3items.py"),           "死亡 C-index 及配对 bootstrap CI"),
 ]
 
 # --check 用的登记值 → 重算来源（真源 JSON 的相对路径 + 取值路径）

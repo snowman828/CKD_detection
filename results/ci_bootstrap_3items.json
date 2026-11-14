@@ -1,0 +1,101 @@
+{
+  "when": "2026-10-14T08:35:17",
+  "B": 2000,
+  "seed": 20261014,
+  "method": "percentile bootstrap",
+  "note": "模型在开发集上固定，仅对测试集行重抽（配对：两模型共用同一重抽行集）",
+  "source_cohort": "results/cohort.parquet",
+  "blind_stratum": {
+    "age-only": {
+      "auc": 0.8731,
+      "ci95": [
+        0.8533,
+        0.8918
+      ],
+      "n_boot_used": 2000
+    },
+    "age+sex": {
+      "auc": 0.8716,
+      "ci95": [
+        0.8512,
+        0.8909
+      ],
+      "n_boot_used": 2000
+    },
+    "age+sex+race": {
+      "auc": 0.8832,
+      "ci95": [
+        0.8628,
+        0.9006
+      ],
+      "n_boot_used": 2000
+    },
+    "clinical-rule": {
+      "auc": 0.8684,
+      "ci95": [
+        0.8469,
+        0.887
+      ],
+      "n_boot_used": 2000
+    },
+    "full": {
+      "auc": 0.8989,
+      "ci95": [
+        0.8796,
+        0.9168
+      ],
+      "n_boot_used": 2000
+    },
+    "_paired_delta_full_minus_ageonly": {
+      "delta": 0.0258,
+      "ci95": [
+        0.0159,
+        0.0358
+      ],
+      "n_boot_used": 2000
+    }
+  },
+  "cox_cindex": {
+    "all_cause": {
+      "c_full": 0.8172,
+      "c_ageonly": 0.8276,
+      "delta": -0.0103,
+      "ci95_full": [
+        0.7709,
+        0.8583
+      ],
+      "ci95_ageonly": [
+        0.7817,
+        0.8699
+      ],
+      "ci95_delta_paired": [
+        -0.0398,
+        0.0215
+      ],
+      "n_test_events": 63,
+      "n_train_events": 1145,
+      "n_boot_used": 2000
+    },
+    "cvd": {
+      "c_full": 0.8512,
+      "c_ageonly": 0.9245,
+      "delta": -0.0733,
+      "ci95_full": [
+        0.8117,
+        0.8922
+      ],
+      "ci95_ageonly": [
+        0.8913,
+        0.9546
+      ],
+      "ci95_delta_paired": [
+        -0.1227,
+        -0.018
+      ],
+      "n_test_events": 17,
+      "n_train_events": 286,
+      "n_boot_used": 2000
+    }
+  },
+  "elapsed_s": 58.6
+}
