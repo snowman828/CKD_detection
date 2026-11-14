@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.1.0 (unreleased)
+## v1.1.0 (2026-11 — DOI 10.5281/zenodo.24211598)
 
 - Add  and four label-manipulation result files
   (, , , ).
