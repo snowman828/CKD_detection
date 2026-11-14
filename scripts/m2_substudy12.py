@@ -1,9 +1,9 @@
-"""M2 子研究①② —— 足迹探针（SHAP×CKM 通路）+ NADKD 分层检测
-遵循 CKD-detection v3 管线（modeling.py）：同特征/同参数/同划分，保证模型一致。
-预注册判定阈值（06 文档 v1.1 §7.1-7.2）：
-  子研究①：ARI ≥ 0.30 且 p<0.001(vs 置换) → 足迹假说；ARI≤0.10 或单特征>60% SHAP → 共现假说
-  子研究②：NADKD 层 AUC ≥ 0.75 且 ΔAUC(全体−层)<0.10 → 独立；AUC≤0.65 或 ΔAUC≥0.15 → 依赖
-输出：results/m2/substudy12_results.json + 控制台报告
+"""M2 sub-studies 1-2: footprint probe (SHAP x CKM pathway) and NADKD-stratified detection.
+Follows the CKD-detection v3 pipeline (modeling.py): same features, hyperparameters and split.
+Pre-specified decision thresholds:
+  Sub-study 1: ARI >= 0.30 with permutation p < 0.001 supports the footprint hypothesis; ARI <= 0.10 or a single feature carrying > 60% of SHAP supports co-occurrence.
+  Sub-study 2: NADKD stratum AUC >= 0.75 with delta AUC (all minus stratum) < 0.10 indicates independent detection; AUC <= 0.65 or delta >= 0.15 indicates dependence.
+Output: results/m2/substudy12_results.json and a console report.
 """
 import pandas as pd, numpy as np, json, os, sys
 from xgboost import XGBClassifier, DMatrix
@@ -48,16 +48,16 @@ model = XGBClassifier(n_estimators=300, max_depth=4, learning_rate=0.05,
                       n_jobs=4, random_state=42)
 model.fit(Xtr, ytr)
 p_te = model.predict_proba(Xte)[:, 1]
-print(f"[基线] test AUC = {roc_auc_score(yte, p_te):.4f} (论文 0.810) | n_test={len(yte)}")
+print(f"[baseline] test AUC = {roc_auc_score(yte, p_te):.4f} (manuscript 0.810) | n_test={len(yte)}")
 
 results = {"baseline_auc": round(float(roc_auc_score(yte, p_te)), 4), "n_test": int(len(yte))}
 
-# ============ 子研究① 足迹探针 ============
-print("\n=== 子研究① 足迹探针（SHAP × CKM 通路） ===")
+# ============ sub-study 1: footprint probe ============
+print("\n=== sub-study 1: footprint probe (SHAP x CKM pathway) ===")
 shap = model.get_booster().predict(DMatrix(Xte), pred_contribs=True)
-shap = np.asarray(shap)[:, :-1]  # 去掉 bias 列
+shap = np.asarray(shap)[:, :-1]  # drop the bias column
 
-# 预注册映射表（对模型输入特征）
+# pre-specified feature-to-pathway map
 PATHWAYS = {
     "hemodynamic": ["sbp", "dbp"],
     "glycotoxic":  ["hba1c", "diabetes"],
@@ -65,24 +65,24 @@ PATHWAYS = {
     "demographic": ["age", "female", "race_black", "race_hisp", "race_other",
                     "poverty_ratio", "education", "bmi"],
 }
-# miss_* 列单独一层（数据质量层）
+# miss_* indicators form a separate data-quality layer
 miss_feats = [f for f in features_model if f.startswith("miss_")]
 PATHWAYS["missing_indicator"] = miss_feats
 feat_to_path = {f: p for p, fs in PATHWAYS.items() for f in fs}
-assert set(feat_to_path) == set(features_model), f"映射表与模型特征不一致: {set(feat_to_path) ^ set(features_model)}"
+assert set(feat_to_path) == set(features_model), f"feature-to-pathway map does not match model features: {set(feat_to_path) ^ set(features_model)}"
 
 mean_abs_shap = np.abs(shap).mean(axis=0)
 order = np.argsort(-mean_abs_shap)
-print("SHAP 重要性排序:")
+print("SHAP importance ranking:")
 for i in order:
     print(f"  {features_model[i]:<22} {mean_abs_shap[i]:.4f}")
 
-# 特征间距离：1 - |SHAP 相关|（特征作用模式相似度）
+# between-feature distance: 1 - |SHAP correlation| (similarity of effect patterns)
 corr = np.corrcoef(shap.T)
-corr = np.nan_to_num(corr, nan=0.0)          # 零方差特征（如全 0 的 miss 列）→ 相关设 0
+corr = np.nan_to_num(corr, nan=0.0)          # zero-variance features (e.g. all-zero miss_* columns) get zero correlation
 dist = 1 - np.abs(corr)
 np.fill_diagonal(dist, 0)
-dist = (dist + dist.T) / 2                     # 强制对称
+dist = (dist + dist.T) / 2                     # enforce symmetry
 dist = np.clip(dist, 0, None)
 link = linkage(squareform(dist), method="ward")
 n_clusters = len(PATHWAYS)
@@ -90,7 +90,7 @@ labels = fcluster(link, n_clusters, criterion="maxclust")
 true = np.array([list(PATHWAYS).index(feat_to_path[f]) for f in features_model])
 ari = adjusted_rand_score(true, labels)
 
-# 置换零分布：打乱映射标签 500 次
+# permutation null: shuffle pathway labels 500 times
 rng = np.random.default_rng(42)
 null_aris = []
 for _ in range(500):
@@ -99,7 +99,7 @@ for _ in range(500):
 null_aris = np.array(null_aris)
 p_val = float((null_aris >= ari).mean())
 
-# 通路口袋命中率：每个通路的特征是否聚类到一起（同通路特征对在同一簇的比例）
+# pocket hit rate: whether features of the same pathway cluster together
 pairs_same = pairs_total = 0
 for i in range(len(features_model)):
     for j in range(i+1, len(features_model)):
@@ -109,7 +109,7 @@ for i in range(len(features_model)):
                 pairs_same += 1
 pocket_hit = pairs_same / pairs_total if pairs_total else np.nan
 
-# 单特征占比（年龄 >60% → 共现假说信号）
+# single-feature share (age > 60% would signal co-occurrence)
 age_share = mean_abs_shap[features_model.index("age")] / mean_abs_shap.sum()
 top1_share = mean_abs_shap.max() / mean_abs_shap.sum()
 
@@ -124,16 +124,16 @@ s1 = {
     "top1_feature_share": round(float(top1_share), 4),
     "top_feature": features_model[order[0]],
     "cluster_labels": {features_model[i]: int(labels[i]) for i in range(len(features_model))},
-    "decision": ("H1a 足迹假说支持" if ari >= 0.30 and p_val < 0.001
-                 else "H1b 共现假说支持" if (ari <= 0.10 or top1_share > 0.60)
-                 else "中间状态（需进一步判别）"),
+    "decision": ("H1a footprint hypothesis supported" if ari >= 0.30 and p_val < 0.001
+                 else "H1b co-occurrence hypothesis supported" if (ari <= 0.10 or top1_share > 0.60)
+                 else "intermediate (requires further discrimination)"),
 }
 results["substudy1_footprint"] = s1
-print(f"\n[子研究①] ARI = {ari:.3f} (置换 p={p_val:.4f}, null 均值={null_aris.mean():.3f})")
-print(f"  通路口袋命中率 = {pocket_hit:.3f} | 年龄 SHAP 占比 = {age_share:.3f} | 判决: {s1['decision']}")
+print(f"\n[sub-study 1] ARI = {ari:.3f} (permutation p={p_val:.4f}, null mean={null_aris.mean():.3f})")
+print(f"  pocket hit rate = {pocket_hit:.3f} | age SHAP share = {age_share:.3f} | decision: {s1['decision']}")
 
-# ============ 子研究② NADKD 分层检测 ============
-print("\n=== 子研究② uACR 盲区检测独立性 ===")
+# ============ sub-study 2: NADKD-stratified detection ============
+print("\n=== sub-study 2: detection independence in the uACR blind spot ===")
 te = test.reset_index(drop=True)
 
 def boot_auc(y, p, n=2000, seed=7):
@@ -148,35 +148,35 @@ def boot_auc(y, p, n=2000, seed=7):
 
 strata = {
     "all": te["ckd"].notna(),
-    "uACR<30 全部成人（盲区人群）": te["uacr"] < 30,
-    "uACR<30 且糖尿病（NADKD 风险人群）": (te["uacr"] < 30) & (te["diabetes"] == 1),
-    "uACR<30 且非糖尿病": (te["uacr"] < 30) & (te["diabetes"] == 0),
-    "uACR<30 且年龄 18-44（衔接子研究③）": (te["uacr"] < 30) & (te["age"] < 45),
-    "uACR<30 且 eGFR>=60（无肾功能下降的盲区对照）": (te["uacr"] < 30) & (te["egfr"] >= 60),
+    "uACR < 30, all adults (blind-spot population)": te["uacr"] < 30,
+    "uACR < 30 with diabetes (NADKD risk group)": (te["uacr"] < 30) & (te["diabetes"] == 1),
+    "uACR < 30 without diabetes": (te["uacr"] < 30) & (te["diabetes"] == 0),
+    "uACR < 30, age 18-44 (links to sub-study 3)": (te["uacr"] < 30) & (te["age"] < 45),
+    "uACR < 30 with eGFR >= 60 (blind-spot control without eGFR loss)": (te["uacr"] < 30) & (te["egfr"] >= 60),
 }
 s2 = {"strata": {}}
 for name, mask in strata.items():
     m = mask.values if hasattr(mask, "values") else mask
     n = int(m.sum())
     if n < 20 or len(np.unique(yte[m])) < 2:
-        s2["strata"][name] = {"n": n, "auc": None, "note": "样本不足或标签单一"}
-        print(f"  [{name}] n={n} — 样本不足或标签单一")
+        s2["strata"][name] = {"n": n, "auc": None, "note": "insufficient sample size or single-class labels"}
+        print(f"  [{name}] n={n} - insufficient sample or single-class labels")
         continue
     auc = roc_auc_score(yte[m], p_te[m])
     ci = boot_auc(yte[m], p_te[m])
     dauc = roc_auc_score(yte, p_te) - auc
     s2["strata"][name] = {"n": n, "auc": round(float(auc), 4), "auc_ci95": ci,
                           "delta_auc_vs_all": round(float(dauc), 4)}
-    print(f"  [{name}] n={n} | AUC={auc:.3f} {ci} | ΔAUC vs 全体={dauc:+.3f}")
+    print(f"  [{name}] n={n} | AUC={auc:.3f} {ci} | delta AUC vs all = {dauc:+.3f}")
 
-nad = s2["strata"].get("uACR<30 全部成人（盲区人群）", {})
+nad = s2["strata"].get("uACR < 30, all adults (blind-spot population)", {})
 if nad.get("auc") is not None:
-    nad["decision"] = ("H2a 独立足迹支持" if nad["auc"] >= 0.75 and nad["delta_auc_vs_all"] < 0.10
-                       else "H2b 依赖白蛋白尿支持" if (nad["auc"] <= 0.65 or nad["delta_auc_vs_all"] >= 0.15)
-                       else "中间状态")
-    print(f"\n[子研究② 判决] {nad['decision']}")
+    nad["decision"] = ("H2a independent footprint supported" if nad["auc"] >= 0.75 and nad["delta_auc_vs_all"] < 0.10
+                       else "H2b dependence on albuminuria supported" if (nad["auc"] <= 0.65 or nad["delta_auc_vs_all"] >= 0.15)
+                       else "intermediate")
+    print(f"\n[sub-study 2 decision] {nad['decision']}")
 results["substudy2_nadkd"] = s2
 
 with open(os.path.join(M2OUT, "substudy12_results.json"), "w", encoding="utf-8") as f:
     json.dump(results, f, ensure_ascii=False, indent=2)
-print(f"\n已保存: {M2OUT}/substudy12_results.json")
+print(f"\nsaved: {M2OUT}/substudy12_results.json")
