@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""#4 标签操纵敏感性（预注册：投稿包/_qc/02_npjDM_Followup/labelmanip_prereg.json）
+"""#4 标签操纵敏感性（预注册：analysis_plan/labelmanip_prereg.json）
 两阶段：
   --stage labels  仅做功效诊断（不训练）：去年龄标签的改变率/患病率/严重度构成
   --stage run     2×2（标签×特征）重训 + 盲区层 ΔAUC 配对 bootstrap，按预注册判据出判决

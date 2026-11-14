@@ -1,24 +1,4 @@
 __pycache__/
-*.py[cod]
-.ipynb_checkpoints/
-.venv/
-venv/
-# data are fetched, not committed (public NHANES)
-*.parquet
-*.sas7bdat
-*.xpt
-data/
-# build artifacts
-*.zip
-*.tar.gz
-results/_prev_*/
-# regenerated figure / verification output (produced by make_cjasn_figures.py / verify_refs.py)
-results/figures_cjasn_v2/
-results/ref_verification_raw.json
+*.pyc
 .DS_Store
-Thumbs.db
-*.bak*
-*.tmp
-~
-*.orig
-__pycache__/
+*.egg-info/

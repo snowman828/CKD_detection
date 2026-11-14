@@ -1,72 +1,48 @@
-# Figure provenance and verification
+# Figure provenance
 
-Every figure in the manuscript is produced by scripts in this repository from the analysis outputs in
-`results/`. No figure is drawn from hand-entered numbers. This file records, per figure, the generator,
-its inputs, and the verification that was actually run against the submitted files.
+Every main-text figure is produced by a script in this repository from analysis outputs committed
+under `results/`. No figure is drawn from hand-entered numbers.
 
-## Chain
-
-```
-results/*.json, results/*.npy, results/*.parquet     (analysis outputs, see REPRODUCE.md)
-        │
-        ├─ scripts/make_cjasn_figures.py  ──→ results/figures_cjasn_v2/Figure1..5.{pdf,eps,png}
-        │      Figure 1  ← results/participant_flow.json
-        │      Figure 2  ← results/test_y.npy + test_proba_{xgb,lr,mlp}.npy   (ROC)
-        │      Figure 3  ← same arrays                                        (calibration deciles)
-        │      Figure 4  ← same arrays + baseline refit (cohort.parquet, seed 42)  (net benefit)
-        │      Figure 5  ← Table 3 of the manuscript file (parsed; 10 rows asserted) + results/model_results.json
-        │
-        └─ scripts/figures_to_print_formats.py ──→ FigureN_CMYK.pdf (vector CMYK, ghostscript)
-                                                    FigureN_CMYK_1200dpi.tif (1200 dpi, ICC Coated FOGRA39)
-```
-
-`make_cjasn_figures.py` writes PDF (vector, `pdf.fonttype=42` = fonts embedded as TrueType), EPS
-(also vector) and PNG (600 dpi) for each figure, and enforces in-script hard checks: every text span
-≥ 8.5 pt, no box overlap, no arrow crossing a box, no element bleeding, and Figure 5's ten value
-labels placed entirely to the right of all plotted ink.
-
-`figures_to_print_formats.py` derives the print/upload formats from **the same vector PDFs**, so the
-CMYK and TIFF files can never drift from the vector set. Print formats need ghostscript and an ICC
-CMYK profile; if either is missing the script **skips and prints the exact command instead of failing
-silently**.
-
-Both scripts resolve their tools portably: the ICC profile from the system colour directory (derived
-from `SystemRoot`), ghOScript from `CKD_GHOSTSCRIPT`, `PATH`, the standard install roots and the conda
-package cache — no machine-specific absolute path is hard-coded, so a third party can re-run them
-unchanged (`--icc` / `--gs` and the `CKD_CMYK_ICC` / `CKD_GHOSTSCRIPT` environment variables override).
-
-## Verification run against the submitted files (2026-10-12)
-
-| Check | Method | Result |
-|---|---|---|
-| Package figures = repository outputs | SHA-256 of all 25 files in the submission's `figures/` vs `results/figures_cjasn_v2/` | 25/25 identical |
-| Print files re-derivable | Re-ran the same ghostscript command on the repository vector PDFs and compared with the in-production CMYK PDFs | identical extracted text, identical drawing-object counts (16/40/65/46/73), identical page boxes, for all 5 figures |
-| Figure 1 counts | Every count in the figure text vs `results/participant_flow.json` | 8/8 present and equal |
-| Figure 5 values | Ten `AUC (95% CI)` labels in the figure vs Table 3 of the manuscript | 10/10 verbatim; the dashed overall line (0.810) traces to `results/model_results.json` (0.8105) |
-| Figure 2 AUC labels | Recomputed `roc_auc_score` from the repository arrays | XGBoost 0.8099, logistic regression 0.7943, MLP 0.7695 — labels match verbatim |
-| Pipeline-level gates | `scripts/rerun_all.py --check` (see REPRODUCE.md) | aborts unless the temporal-validation AUC is 0.8099 (tolerance 1e-4); race-blind variant 0.8065 |
-| Print chain re-run with the shipped script | Ran `scripts/figures_to_print_formats.py` on a copy of the repository vector PDFs and compared with the in-production print files | identical extracted text, drawing-object counts (16/40/65/46/73) and page boxes for all five figures; the 1200 dpi CMYK TIFFs were reproduced at the same pixel dimensions and the same size to two decimal MB |
+| Figure | Script | Primary inputs (committed) | Output |
+|---|---|---|---|
+| Figure 1 — SHAP effect-pattern clustering against the cardiovascular–kidney–metabolic pathway map | `scripts/m6_figure1.py` | `models/xgb_model.json`, `results/model_results.json`, `results/component_subgroup_results.json` | `figures/Figure1.{png,pdf}` |
+| Figure 2 — stratified AUC forest plot | `scripts/m7_figure2.py` | `results/subgroup_dca_incremental.json`, `results/model_results.json` | `figures/Figure2.{png,pdf}` |
+| Figure 3 — case severity composition by age group | `scripts/m8_figure3.py` | `results/cohort_summary.json`, `results/participant_flow.json` | `figures/Figure3.{png,pdf}` |
 
 ## Regenerating the figures
 
 ```bash
 python scripts/build_cohort.py          # or: python scripts/rerun_all.py --check
 python scripts/modeling.py
-python scripts/make_cjasn_figures.py                       # -> results/figures_cjasn_v2/
-python scripts/figures_to_print_formats.py --dir results/figures_cjasn_v2 --dpi 1200
+python scripts/m6_figure1.py
+python scripts/m7_figure2.py
+python scripts/m8_figure3.py
 ```
+
+Print-ready derivatives are produced from the same vector canvases:
+
+```bash
+python scripts/figures_to_print_formats.py --dir figures --dpi 300
+```
+
+`figures_to_print_formats.py` reads the vector PDFs as input, so raster and print variants cannot
+drift from the vector set. Ghostscript and an ICC CMYK profile are optional; when either is missing
+the script prints the exact command it would run instead of failing silently.
+
+## Conventions
+
+- Vector PDFs embed their fonts (`pdf.fonttype = 42`); minima of 8.5 pt apply to every text span.
+- Figure 2 plots stratum AUCs with 95% bootstrap confidence intervals (2,000 resamples); the point
+  estimates printed beside each row also appear in `results/subgroup_dca_incremental.json`.
+- Figure 1 counts and pathway assignments follow the SHAP clustering output in
+  `results/model_results.json`; the adjusted Rand index is reported in the manuscript.
+- Figure 3 uses the same cohort definition as Table 1 and `results/participant_flow.json`.
 
 ## Boundaries
 
-* `results/test_proba_*.npy`, `results/test_y.npy`, `results/test_set.parquet` and
-  `results/cohort.parquet` are **pipeline outputs**, not committed data: they are regenerated by
-  `build_cohort.py` + `modeling.py` from public NHANES files (see `DATA_AVAILABILITY.md`), and the
-  AUC gates in `rerun_all.py --check` stop the run if they drift. The verification above was run
-  against the frozen local copies of those arrays, not against a fresh end-to-end re-execution.
-* `make_cjasn_figures.py` reads the manuscript markdown for Figure 5's Table 3 (override the path with
-  the environment variable `CKD_MANUSCRIPT_MD`). Figure 5's overall dashed reference line is an inline
-  constant (0.810) whose source is `results/model_results.json` (0.8105, rounded) — see the note in
-  the script.
-* Layout depends on the installed matplotlib/font versions. The delivered PDF/EPS files are
-  self-contained (fonts embedded), so the submitted artifacts are stable; a re-run may differ in
-  sub-point spacing.
+`results/test_proba_*.npy`, `results/test_y.npy`, `results/test_set.parquet` and `results/cohort.parquet`
+are pipeline outputs rather than committed data: `build_cohort.py` and `modeling.py` regenerate them
+from public NHANES files (see `DATA_AVAILABILITY.md`), and the AUC gates in `rerun_all.py --check`
+stop the run if they drift. A fresh end-to-end re-execution may differ in sub-point spacing because
+layout depends on the installed matplotlib and font versions; the committed PDFs embed their fonts
+and are therefore stable.

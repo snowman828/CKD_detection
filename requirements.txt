@@ -13,7 +13,7 @@ scipy==1.17.1
 xgboost==3.2.0
 
 # — optional (specific sub-studies or tools; safe to skip on install failure) —
-pymupdf       # make_cjasn_figures.py: font-size self-check only; figures generate fine without it
+pymupdf       # m6_figure1.py / m7_figure2.py / m8_figure3.py: font-size self-check only; figures generate fine without it
 pyreadstat    # p3_knh_validation.py: reads KNHANES .xlsx/.sav files (only if running that script)
 seaborn       # optional figure styling
 PySocks       # SOCKS proxy support (not needed on most machines)

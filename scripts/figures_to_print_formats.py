@@ -8,7 +8,7 @@
 产出（每个 FigureN.pdf）：
   1) FigureN_CMYK_1200dpi.tif —— 1200 dpi 光栅 + ICC 色彩换算（RGB→CMYK，非朴素反相）
   2) FigureN_CMYK.pdf        —— 矢量 CMYK（需 ghostscript；本机若缺则**跳过并打印一键命令**，不静默）
-  3) FigureN.eps 由 make_cjasn_figures.py 直接产出（matplotlib 矢量后端），本脚本不重复生成。
+  3) FigureN.eps 由 m6_figure1/m7_figure2/m8_figure3.py 直接产出（matplotlib 矢量后端），本脚本不重复生成。
 
 可移植性：ICC 与 ghostscript 均按「环境变量 → 标准安装目录（由 SystemRoot/ProgramFiles/ProgramData
 等环境变量推导）→ PATH」的顺序查找，**不写死任何机器专属绝对路径**，便于第三方检出后直接复跑。

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""CKD-detection 模型产物导出（满足 CJASN "trained machine learning models" 条款）
+"""CKD-detection 模型产物导出(trained model artifacts for reuse)
 
 设计原则
 - 完全复现 `modeling.py` 的预处理与超参数（train = 2011/2013/2015；test = 2017）

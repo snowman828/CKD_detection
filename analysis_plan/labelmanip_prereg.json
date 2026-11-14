@@ -1,0 +1,48 @@
+{
+ "id": "labelmanip_v1",
+ "created": "2026-10-29",
+ "status": "PRE-REGISTERED — 本文件先于任何执行写入；执行后只追加 results 字段，不得回改判据",
+ "purpose": "把稿件核心声称从『表观优势与 eGFR 定义结构一致（不可分离）』升级为『定义性贡献可分离/可量化』；同时给出可证伪的判决",
+ "manipulation": {
+  "definition": "去年龄项 eGFR：egfr_nf = egfr / 0.9938^age（对 CKD-EPI 2021 肌酐方程的年龄因子做精确代数移除，无近似）",
+  "new_label": "ckd_nf = (egfr_nf < 60) OR (uacr >= 30)",
+  "rationale": "原标签通过 0.9938^age 与年龄共线；移除后标签不再随年龄指数衰减，若模型相对年龄的增量仍存在，则该增量不是定义产生的",
+  "not_done": "不改变 uACR 定义、不改变阈值 60、不改变队列纳排、不改任何特征"
+ },
+ "design": {
+  "cells": "2×2：标签{原, 去年龄} × 特征{全 12 项, 全 12 项去 age}",
+  "primary_estimand": "盲区层（uACR<30）内 ΔAUC = AUC(full) − AUC(age-only)，两标签各算一次，配对 bootstrap 差值的 95%CI",
+  "population": "训练 2011/2013/2015；测试 2017；盲区层 uACR<30",
+  "model": "XGBoost n_estimators=300, max_depth=4, learning_rate=0.05, subsample=0.8, colsample_bytree=0.8, random_state=42（与主分析完全一致）",
+  "bootstrap": "B=2000, seed=20261014, percentile, 仅重抽测试集行，模型固定，配对（全模型与年龄模型共用同一行集）"
+ },
+ "acceptance_criteria": {
+  "POWER_FALSIFIER": "盲区层标签改变率 < 5% ⇒ 判 INCONCLUSIVE（操纵无功效），不得解释为阴性证据；此时稿件维持『不可分离』表述",
+  "H1_definition_dominant": "Δ_nf ≤ 0.5 × Δ_orig(0.0258) 且 CI(Δ_nf) 含 0 ⇒ 表观优势主要为定义性；可写入『定义性贡献 ≥50%，模型自身增量不显著』",
+  "H2_increment_genuine": "CI(Δ_nf) 排除 0 且 Δ_nf ≥ 0.8 × Δ_orig ⇒ 优势非定义性；必须推翻/降级现稿『part of the advantage is definitional』的表述",
+  "H3_partial": "CI(Δ_nf) 排除 0 但 Δ_nf < 0.8 × Δ_orig ⇒ 报告定义性占比 = 1 − Δ_nf/Δ_orig，并给区间（bootstrap 两量同批重抽）",
+  "secondary": "2×2 中『去 age 特征』一格若 AUC 基本不变 ⇒ 支持『模型主要靠年龄代理』；若显著下降 ⇒ 说明 age 承载了非定义信息"
+ },
+ "integrity_guards": [
+  "严禁覆盖 results/cohort.parquet（md5 eb1fb7f1b28288d2 为基线）；新标签只作为内存列/新文件",
+  "输出目录限定 results/m2/labelmanip/，不得写入投稿包",
+  "每层必须报告 n_case/n_control 变化（标签改变会改变病例构成，不报告即不可解释）",
+  "同 seed 同 B；若与主分析 seed 不同，必须显式说明并给出两 seed 结果",
+  "任何 CI 必须来自实际重抽，不得用解析近似替代"
+ ],
+ "expected_interpretation_limits": [
+  "即使 H1 成立，也不能声称因果；只能说『去年龄标签下增量不再显著』",
+  "标签改变会同时改变基线患病率与严重度构成，故必须同时报 prevalence 与 severity 分布变化",
+  "单体系（NHANES）内操纵，不外推到 KNHANES"
+ ],
+ "amendments": [
+  {
+   "when": "2026-10-29T09:14:21",
+   "made_before": "any training run（仅看过 labels_diagnostic.json）",
+   "what": "把功效判据从「盲区层标签改变率≥5%」改为「盲区层**病例**标签改变比例≥10%」",
+   "why": "原判据分母含对照，而对照不可能由 CKD→非CKD 改变（去年龄只抬高 eGFR，只减不增），故该指标上限＝该层患病率≈5.5%，5% 阈值几乎不可达＝判据本身失效（度量错配，非操纵无效）",
+   "evidence": "labels_diagnostic.json：全体 3.77% / 盲区 4.95% / 盲区病例 253→25（改变 228/253 = 90.1%）",
+   "consequence": "原判据的 INCONCLUSIVE 撤回；改为按病例改变比例 90.1% 判「操纵有功效」，同时保留原指标数值以备审计"
+  }
+ ]
+}
