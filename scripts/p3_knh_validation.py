@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-"""阶段 C：KNHANES 跨体系外部验证（文件就位后一键执行）
+"""KNHANES cross-system validation (runs once the source files are in place).
 
-设计
-- 开发集/超参/插补/特征/阈值（0.1602）**全部冻结**（与主分析、阶段 B 完全一致）
-- 自检门：同一冻结模型在 NHANES 2017–2018 必须复现 AUC 0.8099，否则中止（防止流程漂移）
-- 变量自动识别（KNHANES 变量名以官方利用指南京为准，脚本按正则匹配并在日志列出未识别项）
-- 单位自检门：uACR 中位数若落在 2–20 mg/g 之外，视为单位/量纲问题 → **中止并报错**，不产出可疑数字
-- 输出：results/p3_knh_validation.json
-用法
+Design
+- Development set, hyperparameters, imputation, features and threshold (0.1602) are frozen and identical to the main analysis.
+- Self-check gate: the same frozen model must reproduce AUC 0.8099 on NHANES 2017-2018; otherwise abort.
+- Variables are matched by regular expression against the official KNHANES codebook; unmatched items are logged.
+- Unit gate: a median uACR outside 2-20 mg/g is treated as a unit problem and aborts the run rather than emitting suspect numbers.
+- Output: results/p3_knh_validation.json
+Usage
   python scripts/p3_knh_validation.py --knh "" [--dry-run]
 """
 import argparse, glob, io, json, os, re, sys, zipfile, tempfile
@@ -16,7 +16,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from xgboost import XGBClassifier
 
-PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # 仓根（GitHub 检出即可运行）
+PROJ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # repository root (runs from a fresh clone)
 DATA, OUT = os.path.join(PROJ, "data"), os.path.join(PROJ, "results")
 FEATURES = ["age", "sex", "race", "poverty_ratio", "education", "bmi", "sbp", "dbp", "hba1c", "diabetes", "total_cholesterol", "hdl"]
 RNG, YTHR = 2026, 0.1602
@@ -43,7 +43,7 @@ def load_dir(d):
             else:
                 ok.append(f)
         except Exception as e:
-            print(f"  ⚠️ 解压/读取失败 {os.path.basename(f)}: {e}")
+            print(f"  ⚠️ failed to unpack or read {os.path.basename(f)}: {e}")
     return ok
 
 def read_any(f):
@@ -54,7 +54,7 @@ def read_any(f):
         df, _ = pyreadstat.read_sav(f)
         return df
     except Exception as e:
-        print(f"  ⚠️ 需 pyreadstat 读 .sav（{e}）→ 请改用 SAS 格式")
+        print(f"  ⚠️ pyreadstat is required to read .sav files（{e}）-> use the SAS transport format instead")
         return None
 
 def pick(df, key):
@@ -67,18 +67,18 @@ def pick(df, key):
     return cand[0] if cand else None
 
 def _dry_run(DATA):
-    """--dry-run：不要求 KNHANES 数据，仅（1）复现冻结流程自检门（2）打印投件预备清单。"""
+    """--dry-run: no KNHANES data required; reproduce the frozen pipeline gate and print the input checklist."""
     import pandas as pd
     from xgboost import XGBClassifier
     from sklearn.metrics import roc_auc_score
-    print("== 投件预备检查（--dry-run）==")
+    print("== input readiness check (--dry-run) ==")
     feats = ["age", "sex", "race", "poverty_ratio", "education", "bmi", "sbp", "dbp", "hba1c", "diabetes", "total_cholesterol", "hdl"]
-    print("  KNHANES 侧所需变量（12 个特征 + 2 个标签成分）：")
+    print("  KNHANES inputs required (12 features plus 2 label components):")
     for f in feats:
         print("     - %s" % f)
-    print("     - creatinine（血清肌酐，用于 eGFR）")
-    print("     - urine albumin + urine creatinine（用于 uACR；单位须为 mg/L 与 mg/dL，脚本内含单位门校验）")
-    print("  NHANES 侧数据目录：%s（现有 %d 个 XPT）" % (DATA, len(glob.glob(os.path.join(DATA, "*.XPT")))))
+    print("     - creatinine (serum, for eGFR)")
+    print("     - urine albumin and urine creatinine (for uACR; expected in mg/L and mg/dL, enforced by the unit gate)")
+    print("  NHANES data directory: %s(currently %d  XPT files)" % (DATA, len(glob.glob(os.path.join(DATA, "*.XPT")))))
     CYC = {"G": 2011, "H": 2013, "I": 2015}
     def nhanes(cyc):
         L = lambda n: pd.read_sas(os.path.join(DATA, f"{n}_{cyc}.XPT"), format="xport")
@@ -107,9 +107,9 @@ def _dry_run(DATA):
     Xtr, Xv = F(enc(dev[FEATURES])), F(enc(val[FEATURES]))
     xgb = XGBClassifier(n_estimators=300, max_depth=4, learning_rate=0.05, subsample=0.8, colsample_bytree=0.8, eval_metric="logloss", n_jobs=4, random_state=42).fit(Xtr, dev["ckd"].values)
     a17 = roc_auc_score(val["ckd"].values, xgb.predict_proba(Xv)[:, 1])
-    print("  自检门：NHANES 2017–2018 XGB AUC=%.4f（须=0.8099）%s" % (a17, "✅" if abs(a17 - 0.8099) <= 1e-4 else "❌ 漂移"))
+    print("  self-check gate: NHANES 2017-2018 XGB AUC=%.4f(expected 0.8099)%s" % (a17, "PASS" if abs(a17 - 0.8099) <= 1e-4 else "DRIFT"))
     ok = abs(a17 - 0.8099) <= 1e-4
-    print("  结论：%s —— 数据落位后即可直接运行（无需再改脚本）" % ("流程健康，等待 KNHANES 原始文件" if ok else "流程漂移，须先排查"))
+    print("  conclusion: %s - runnable as soon as the data are in place" % ("pipeline healthy; waiting for KNHANES source files" if ok else "pipeline drift; investigate before proceeding"))
     return 0 if ok else 1
 
 
@@ -118,20 +118,20 @@ def main():
     ap.add_argument("--dry-run", action="store_true"); a = ap.parse_args()
     if a.dry_run:
         sys.exit(_dry_run(DATA))
-    if not a.knh: sys.exit("❌ 请提供 --knh <目录>（或使用 --dry-run 做预备检查）")
-    if not os.path.isdir(a.knh): sys.exit(f"❌ 目录不存在: {a.knh}")
+    if not a.knh: sys.exit("❌ provide --knh <dir> (or use --dry-run for the readiness check)")
+    if not os.path.isdir(a.knh): sys.exit(f"❌ directory does not exist: {a.knh}")
     files = load_dir(a.knh)
-    print(f"发现 {len(files)} 个数据文件")
-    if not files: sys.exit("❌ 未发现 .sas7bdat/.sav/.xpt/.zip —— 请按取件指引放置")
+    print(f"发现 {len(files)}  data files found")
+    if not files: sys.exit("❌ no .sas7bdat/.sav/.xpt/.zip found; place the files as described in DATA_AVAILABILITY.md")
 
-    # ---- 逐文件扫描：打印可用变量映射（便于人工核对） ----
+    # ---- per-file scan: print the variable mapping for manual review ----
     merged, report = None, {}
     for f in files:
         df = read_any(f)
         if df is None or len(df) == 0: continue
         idc = pick(df, "id")
         if idc is None:
-            print(f"  ⚠️ {os.path.basename(f)}: 无 ID 列 → 跳过"); continue
+            print(f"  ⚠️ {os.path.basename(f)}: no ID column; skipped"); continue
         sel = {"ID": idc}
         for k in PAT:
             if k == "id": continue
@@ -141,31 +141,31 @@ def main():
         sub = df[list(sel.values())].rename(columns={v: k for k, v in sel.items()})
         report[os.path.basename(f)] = {k: sel[k] for k in sel if k != "ID"}
         merged = sub if merged is None else merged.merge(sub, on="ID", how="outer")
-    if merged is None or len(merged) == 0: sys.exit("❌ 未能合并任何数据（检查 ID 列）")
-    print("变量映射:"); print(json.dumps(report, ensure_ascii=False, indent=1)[:1400])
+    if merged is None or len(merged) == 0: sys.exit("❌ could not merge any file; check the ID column")
+    print("variable mapping:"); print(json.dumps(report, ensure_ascii=False, indent=1)[:1400])
     need = ["age", "sex", "creatinine", "ualb", "ucrea"]
     miss = [k for k in need if k not in merged.columns]
-    if miss: sys.exit(f"❌ 关键变量缺失 {miss} —— 需含血液肌酐与尿白蛋白/尿肌酐的文件组")
+    if miss: sys.exit(f"❌ missing key variables {miss} —— need the file group holding serum creatinine and urine albumin/creatinine")
 
     d = merged.copy()
     d = d[d["age"].notna() & (d["age"] >= 18)]
     if "pregnant" in d: d = d[d["pregnant"] != 1]
-    # KNHANES 尿白蛋白 mg/L、尿肌酐 mg/dL → uACR(mg/g) = Ualb / (Ucrea × 0.01) = Ualb × 100 / Ucrea
-    # （与主分析 NHANES 完全一致；若某波次单位不同，中位数自检门会中止而不是产出可疑数字）
+    # urine albumin mg/L and creatinine mg/dL -> uACR(mg/g) = Ualb * 100 / Ucrea
+    # (identical to the NHANES analysis; a different unit in any wave trips the median gate instead of producing suspect values)
     d["uacr"] = (d["ualb"] * 100.0 / d["ucrea"]).where(d["ualb"].notna() & d["ucrea"].notna() & (d["ucrea"] > 0))
     med = float(np.nanmedian(d["uacr"]))
-    print(f"  uACR 中位数 = {med:.2f} mg/g（单位自检窗口 2–20）")
+    print(f"  median uACR = {med:.2f} mg/g(unit gate window 2-20)")
     if not (2.0 <= med <= 20.0):
-        sys.exit(f"❌ uACR 中位数 {med:.2f} 越界 → 单位/量纲不符。当前按 Ualb(mg/L)×100/Ucrea(mg/dL) 计算；"
-                 f"请依官方利用指南京核对单位（若 Ucrea 为 mg/L，则应改为 Ualb/Ucrea），脚本不产出可疑数字。")
+        sys.exit(f"❌ uACR 中位数 {med:.2f} out of range: unit mismatch. Currently computed as Ualb(mg/L) * 100 / Ucrea(mg/dL);"
+                 f"check the official codebook (if Ucrea is in mg/L, use Ualb/Ucrea); the script emits nothing rather than a suspect value.")
     k = np.where(d["sex"] == 2, 0.7, 0.9); al = np.where(d["sex"] == 2, -0.241, -0.302)
     s = d["creatinine"] / k
     d["egfr"] = (142.0 * np.minimum(s, 1.0) ** al * np.maximum(s, 1.0) ** (-1.200) * 0.9938 ** d["age"] * np.where(d["sex"] == 2, 1.012, 1.0)).where(d["creatinine"].notna())
     d["ckd"] = ((d["egfr"] < 60) | (d["uacr"] >= 30)).astype(float)
     d = d[d["ckd"].notna()]
-    print(f"  KNHANES 队列 n={len(d)} CKD={int(d['ckd'].sum())} ({100*d['ckd'].mean():.2f}%)")
+    print(f"  KNHANES cohort n={len(d)} CKD={int(d['ckd'].sum())} ({100*d['ckd'].mean():.2f}%)")
 
-    # ---- NHANES 开发集（同一流程）+ 自检 ----
+    # ---- NHANES development set (same pipeline) and self-check ----
     CYC = {"G": 2011, "H": 2013, "I": 2015}
     def nhanes(cyc):
         L = lambda n: pd.read_sas(os.path.join(DATA, f"{n}_{cyc}.XPT"), format="xport")
@@ -194,14 +194,14 @@ def main():
     Xtr, Xv = F(enc(dev[FEATURES])), F(enc(val[FEATURES]))
     xgb = XGBClassifier(n_estimators=300, max_depth=4, learning_rate=0.05, subsample=0.8, colsample_bytree=0.8, eval_metric="logloss", n_jobs=4, random_state=42).fit(Xtr, dev["ckd"].values)
     a17 = roc_auc_score(val["ckd"].values, xgb.predict_proba(Xv)[:, 1])
-    print(f"  自检门：NHANES 2017–2018 XGB AUC={a17:.4f}（须=0.8099）")
-    if abs(a17 - 0.8099) > 1e-4: sys.exit("❌ 自检未通过 → 流程漂移，中止")
+    print(f"  self-check gate: NHANES 2017-2018 XGB AUC={a17:.4f}(expected 0.8099)")
+    if abs(a17 - 0.8099) > 1e-4: sys.exit("self-check failed: pipeline drift, aborting")
 
-    # ---- KNHANES 外部评估（缺什么特征就用中位数 + 缺失指示列，与主分析同规则） ----
+    # ---- external evaluation on KNHANES (median imputation plus missingness flags, as in the main analysis) ----
     for f in FEATURES:
         if f not in d.columns:
             d[f] = np.nan
-            print(f"  ⚠️ KNHANES 缺特征 {f} → 以开发集中位数填补 + 缺失指示列（并按缺失机制在结果中标注）")
+            print(f"  ⚠️ KNHANES missing feature {f} -> imputed with the development-set median plus a missingness flag, noted in the results")
     Xk = F(enc(d[FEATURES])); pk = xgb.predict_proba(Xk)[:, 1]; yk = d["ckd"].values
 
     def boot(y, p, n=5000):
@@ -233,7 +233,7 @@ def main():
     }
     json.dump(out, open(os.path.join(OUT, "p3_knh_validation.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     print(json.dumps(out, ensure_ascii=False, indent=1))
-    print("\n✅ 已写 results/p3_knh_validation.json")
+    print("\nwrote results/p3_knh_validation.json")
 
 if __name__ == "__main__":
     main()
