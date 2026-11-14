@@ -272,6 +272,39 @@ for lab, m in cells:
     out["intersectional"]["items"].append({"cell": lab, "n": int(m.sum()), "events": int(y.sum()), "auc": round(float(a), 4), "ci95": ci})
     print(f"   {lab:<26} n={int(m.sum()):<5} 事件={int(y.sum()):<4} AUC={a:.4f} CI={ci}", flush=True)
 
+
+# ---------- P1-08 临床影响量化（口径：非加权计数，与原版产物一致） ----------
+def _ops_unw(y, pr, thr):
+    pd_ = pr >= thr
+    tp = int((pd_ & (y == 1)).sum()); fp = int((pd_ & (y == 0)).sum())
+    fn_ = int(((~pd_) & (y == 1)).sum()); tn = int(((~pd_) & (y == 0)).sum()); N = len(y)
+    return {"sens": round(float(tp / max(tp + fn_, 1)), 4), "spec": round(float(tn / max(tn + fp, 1)), 4),
+            "ppv": round(float(tp / max(tp + fp, 1)), 4), "npv": round(float(tn / max(tn + fn_, 1)), 4),
+            "flagged_per1000": round(float(1000 * (tp + fp) / N), 1),
+            "tp_per1000": round(float(1000 * tp / N), 1), "fp_per1000": round(float(1000 * fp / N), 1)}
+
+_ci = {"screened_per_1000": 1000}
+_ci["model_triage"] = _ops_unw(yte, p_x, YTHR)
+_u, _e, _dm = test["uacr"].values, test["egfr"].values, test["diabetes"].values
+_tp = (p_x >= YTHR) & (yte == 1)
+_per = lambda m: round(float(1000 * int((_tp & m).sum()) / len(yte)), 1)
+_ci["detected_with_albuminuria_per1000"] = _per(_u >= 30)
+_ci["detected_with_albuminuria_preserved_egfr_per1000"] = _per((_u >= 30) & (_e >= 60))
+_ci["sglt2i_eligibility_proxy_per1000"] = _per(((_u >= 200) | ((_dm == 1) & (_u >= 30))) & (_e >= 20))
+_ci["sglt2i_proxy_definition"] = ("uACR >=200 mg/g, or diabetes with uACR >=30 mg/g, both with eGFR >=20 mL/min/1.73 m2 "
+                                 "(proxy, not a formal eligibility assessment)")
+_a60 = test["age"].values >= 60
+_tp60 = int((_a60 & (yte == 1)).sum())
+_ci["screen_all_age60plus"] = {"sens": 1.0, "spec": 0.0, "ppv": round(float(_tp60 / max(int(_a60.sum()), 1)), 4), "npv": 0.0,
+    "flagged_per1000": 1000.0, "tp_per1000": round(float(1000 * _tp60 / max(int(_a60.sum()), 1)), 1),
+    "fp_per1000": round(float(1000 * (int(_a60.sum()) - _tp60) / max(int(_a60.sum()), 1)), 1),
+    "share_of_cohort_per1000": round(float(1000 * int(_a60.sum()) / len(yte)), 0)}
+_ci["efficiency_flagged_per_detected_case"] = {
+    "model": round(_ci["model_triage"]["flagged_per1000"] / _ci["model_triage"]["tp_per1000"], 1),
+    "screen_all_age60plus": round(1000.0 / _ci["screen_all_age60plus"]["tp_per1000"], 1)}
+out["clinical_impact"] = _ci
+print("   P1-08 clinical_impact", _ci, flush=True)
+
 json.dump({"note": "P1 clinical/equity addendum (expert-panel items A-phase)", "results": out},
           open(os.path.join(RES, "p1_clinical_equity.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 print("✅ p1_clinical_equity.json 已写（用时 %.0fs）" % (time.time() - t0), flush=True)

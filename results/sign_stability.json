@@ -1,0 +1,63 @@
+{
+ "when": "2026-10-29T09:19:23",
+ "B": 500,
+ "seeds": [
+  42,
+  7,
+  2026,
+  123
+ ],
+ "claim": "Δ(full-no-age − age-only) < 0（去掉 age 后层内增量反转）",
+ "rows": [
+  {
+   "seed": 42,
+   "auc": {
+    "age-only": 0.8731,
+    "full": 0.8989,
+    "full-no-age": 0.8109
+   },
+   "delta_full": 0.0258,
+   "delta_noage": -0.0621,
+   "ci95_delta_noage_paired_vs_seed42": null
+  },
+  {
+   "seed": 7,
+   "auc": {
+    "age-only": 0.8731,
+    "full": 0.8985,
+    "full-no-age": 0.815
+   },
+   "delta_full": 0.0253,
+   "delta_noage": -0.0581,
+   "ci95_delta_noage_paired_vs_seed42": null
+  },
+  {
+   "seed": 2026,
+   "auc": {
+    "age-only": 0.8728,
+    "full": 0.8985,
+    "full-no-age": 0.8179
+   },
+   "delta_full": 0.0257,
+   "delta_noage": -0.0549,
+   "ci95_delta_noage_paired_vs_seed42": null
+  },
+  {
+   "seed": 123,
+   "auc": {
+    "age-only": 0.8732,
+    "full": 0.8978,
+    "full-no-age": 0.815
+   },
+   "delta_full": 0.0246,
+   "delta_noage": -0.0582,
+   "ci95_delta_noage_paired_vs_seed42": null
+  }
+ ],
+ "all_negative": true,
+ "range_delta_noage": [
+  -0.0621,
+  -0.0549
+ ],
+ "verdict": "SIGN-STABLE：4/4 种子均为负（范围 -0.0621 ~ -0.0549）⇒ 头条可作为结论写入"
+}

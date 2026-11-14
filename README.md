@@ -6,9 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 **Public repository**: https://github.com/snowman828/CKD_detection
 
-**Key result**: XGBoost AUC 0.810 (95% CI 0.796–0.823) for CKD detection in a completely
-unseen NHANES cycle (2017–2018; n=5,801), using only non-kidney-specific routine clinical
-variables. Development set: NHANES 2011–2016 (n=17,777).
+**Key result**: in a temporally held-out NHANES test set (2017-2018; n=5,801; CKD n=1,017) the model reached AUC 0.810 (95% CI 0.796-0.823), but an age-only model refitted within the albuminuria-blind stratum reached 0.873 versus 0.899 with all features. Re-deriving CKD after removing the age term from the CKD-EPI 2021 equation left 25 of 253 cases (90.1%), and dropping age from the predictors reversed the within-stratum increment (+0.026 to -0.0622): a measurable part of the reported advantage is definitional. Applied without refitting to KNHANES 2022-2024 (n=17,045), discrimination transferred (AUC 0.7791) but calibration did not.
 
 ---
 

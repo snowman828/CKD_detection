@@ -1,0 +1,99 @@
+{
+  "when": "2026-10-29T09:16:55",
+  "B": 2000,
+  "seed": 20261014,
+  "label_definition": "ckd_nf = (egfr/0.9938^age < 60) | (uacr >= 30)",
+  "cells": {
+    "ckd": {
+      "n_blind": 4602,
+      "n_case": 253,
+      "auc": {
+        "age-only": 0.8731,
+        "full": 0.8989,
+        "full-no-age": 0.8109
+      },
+      "ci95": {
+        "age-only": [
+          0.8533,
+          0.8918
+        ],
+        "full": [
+          0.8796,
+          0.9168
+        ],
+        "full-no-age": [
+          0.7868,
+          0.833
+        ]
+      },
+      "delta_full": {
+        "delta": 0.0258,
+        "ci95": [
+          0.0159,
+          0.0358
+        ],
+        "n_boot_used": 2000,
+        "ci_excludes_zero": true
+      },
+      "delta_full-no-age": {
+        "delta": -0.0622,
+        "ci95": [
+          -0.0859,
+          -0.0389
+        ],
+        "n_boot_used": 2000,
+        "ci_excludes_zero": true
+      }
+    },
+    "ckd_nf": {
+      "n_blind": 4602,
+      "n_case": 25,
+      "auc": {
+        "age-only": 0.7813,
+        "full": 0.843,
+        "full-no-age": 0.8055
+      },
+      "ci95": {
+        "age-only": [
+          0.7055,
+          0.8457
+        ],
+        "full": [
+          0.7441,
+          0.9194
+        ],
+        "full-no-age": [
+          0.7115,
+          0.8838
+        ]
+      },
+      "delta_full": {
+        "delta": 0.0617,
+        "ci95": [
+          -0.0165,
+          0.1332
+        ],
+        "n_boot_used": 2000,
+        "ci_excludes_zero": false
+      },
+      "delta_full-no-age": {
+        "delta": 0.0242,
+        "ci95": [
+          -0.0906,
+          0.1254
+        ],
+        "n_boot_used": 2000,
+        "ci_excludes_zero": false
+      }
+    }
+  },
+  "verdict": {
+    "rule": "INCONCLUSIVE_POWER：去年龄格 n_case=25 < 50，CI 宽 0.150 ⇒ 不具检验力；只报描述值，不得据以判 H1/H2/H3",
+    "powered": false,
+    "min_cases": 50,
+    "delta_orig": 0.0258,
+    "delta_nf": 0.0617,
+    "cidiff_excludes_zero": false,
+    "prereg_baseline": 0.0258
+  }
+}

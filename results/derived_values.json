@@ -1,0 +1,21 @@
+{
+ "source_files": [
+  "09_无湿实验执行/results/m2/labelmanip/labels_diagnostic.json",
+  "09_无湿实验执行/results/m2/labelmanip/labelmanip_results.json",
+  "09_无湿实验执行/results/m2/labelmanip/sign_stability.json"
+ ],
+ "formula": "drop_n = n_orig - n_nf ; drop_pct = 100*(n_orig-n_nf)/n_orig",
+ "n_orig": 253,
+ "n_nf": 25,
+ "drop_n": 228,
+ "drop_pct": 90.12,
+ "auc_full_noage": 0.8109,
+ "delta_noage": -0.0622,
+ "ci_width_noage": 0.047,
+ "range_min": -0.0621,
+ "range_max": -0.0549,
+ "sign_stable": true,
+ "n_case_nf": 25,
+ "ci_width_nf": 0.1497,
+ "ci_width_note": "ckd_nf 格 delta_full 的 95%CI 宽度（labelled underpowered）"
+}
