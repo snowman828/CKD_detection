@@ -1,0 +1,29 @@
+{
+ "design": "labels rebuilt per age exponent; models retrained; blind stratum only",
+ "rows": [
+  {
+   "age_exponent": 1.0,
+   "n_blind": 4602,
+   "n_cases": 25,
+   "auc_age_only": 0.8196,
+   "auc_full": 0.8424,
+   "delta": 0.0228
+  },
+  {
+   "age_exponent": 0.9938,
+   "n_blind": 4602,
+   "n_cases": 253,
+   "auc_age_only": 0.8767,
+   "auc_full": 0.9001,
+   "delta": 0.0234
+  },
+  {
+   "age_exponent": 0.99,
+   "n_blind": 4602,
+   "n_cases": 772,
+   "auc_age_only": 0.8834,
+   "auc_full": 0.9066,
+   "delta": 0.0231
+  }
+ ]
+}

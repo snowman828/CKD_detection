@@ -1,0 +1,60 @@
+{
+ "design": "test set (2017-2018); label = eGFR<60 or uACR>=30; only the age exponent varies",
+ "check": {
+  "reproduced_2021": true,
+  "reproduced_no_age": true,
+  "observed_2021": 253,
+  "observed_no_age": 25
+ },
+ "rows": [
+  {
+   "age_exponent": 1.0,
+   "n_ckd_total": 769,
+   "n_blind_ckd": 25,
+   "n_ckd_from_egfr_only": 25,
+   "median_egfr_blind_cases": 57.20287821502078
+  },
+  {
+   "age_exponent": 0.998,
+   "n_ckd_total": 802,
+   "n_blind_ckd": 55,
+   "n_ckd_from_egfr_only": 55,
+   "median_egfr_blind_cases": 53.37263641755638
+  },
+  {
+   "age_exponent": 0.995,
+   "n_ckd_total": 913,
+   "n_blind_ckd": 156,
+   "n_ckd_from_egfr_only": 156,
+   "median_egfr_blind_cases": 51.66936434373292
+  },
+  {
+   "age_exponent": 0.9938,
+   "n_ckd_total": 1017,
+   "n_blind_ckd": 253,
+   "n_ckd_from_egfr_only": 253,
+   "median_egfr_blind_cases": 52.34433609088366
+  },
+  {
+   "age_exponent": 0.992,
+   "n_ckd_total": 1204,
+   "n_blind_ckd": 428,
+   "n_ckd_from_egfr_only": 428,
+   "median_egfr_blind_cases": 51.479251784932934
+  },
+  {
+   "age_exponent": 0.99,
+   "n_ckd_total": 1555,
+   "n_blind_ckd": 772,
+   "n_ckd_from_egfr_only": 772,
+   "median_egfr_blind_cases": 51.26742107490609
+  },
+  {
+   "age_exponent": 0.985,
+   "n_ckd_total": 2774,
+   "n_blind_ckd": 1973,
+   "n_ckd_from_egfr_only": 1973,
+   "median_egfr_blind_cases": 46.68444313364043
+  }
+ ]
+}
